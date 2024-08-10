@@ -1,20 +1,19 @@
 package task.epic;
 
-import task.Status;
-import task.single.Task;
+import task.single.SingleTask;
 
-public class SubTask extends Task {
+public class SubTask extends SingleTask {
 
     private final Integer epicId;
 
-    public SubTask(String name, String description) {
+    public SubTask(String name, String description, Integer epicId) {
         super(name, description);
-        epicId = null;
+        this.epicId = epicId;
     }
 
-    public SubTask(String name, String description, Status status, Integer id, Integer epicId) {
-        super(name, description, status, id);
-        this.epicId = epicId;
+    protected SubTask(SubTask subTask) {
+        super(subTask);
+        this.epicId = subTask.epicId;
     }
 
     public Integer getEpicId() {
@@ -23,17 +22,17 @@ public class SubTask extends Task {
 
     @Override
     public SubTask getCopy() {
-        return new SubTask(getName(), getDescription(), getStatus(), getId(), getEpicId());
+        return new SubTask(this);
     }
 
     @Override
     public String toString() {
         return "SubTask{" +
-                "name='" + super.getName() + '\'' +
-                ", description='" + super.getDescription() + '\'' +
-                ", id=" + super.getId() +
-                ", status=" + super.getStatus() +
-                ", epicId=" + epicId +
+                "epicId=" + epicId +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
                 '}';
     }
 }

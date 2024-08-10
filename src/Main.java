@@ -1,163 +1,254 @@
 import task.Status;
 import task.epic.EpicTask;
 import task.epic.SubTask;
-import task.single.Task;
-
-import java.util.ArrayList;
-import java.util.List;
+import task.single.SingleTask;
 
 public class Main {
 
     public static void main(String[] args) {
-        Manager manager = new Manager();
-        testFromPracticum(manager);
-        System.out.println("*\n".repeat(3));
-
-        Task task1 = new Task("Одиночная задача1", "Описание одиночной задачи1");
-        Task task2 = new Task("Одиночная задача2", "Описание одиночной задачи2");
-        Task task3 = new Task("Одиночная задача3", "Описание одиночной задачи3");
-
-        EpicTask epicTask1 = new EpicTask("Покупка машины", "Покупка машины до 20xx г.");
-        EpicTask epicTask2 = new EpicTask("Покупка квартиры", "Покупка квартиры до 20yy г.");
-
-        SubTask subTask1 = new SubTask("Посмотреть цены", "Авито");
-        SubTask subTask2 = new SubTask("Посмотреть цены", "АвтоРу");
-        SubTask subTask3 = new SubTask("Посмотреть цены", "Яндекс");
-
-        List<SubTask> listSubTasksCar = new ArrayList<>();
-        listSubTasksCar.add(subTask1);
-        listSubTasksCar.add(subTask2);
-        listSubTasksCar.add(subTask3);
-
-        List<SubTask> listSubTasksFlat = new ArrayList<>(listSubTasksCar);
-
-        manager.addTaskToMap(task1);
-        manager.addTaskToMap(task2);
-        manager.addTaskToMap(task3);
-        manager.addTaskToMap(epicTask1);
-        manager.addTaskToMap(subTask1);
-        manager.addTaskToMap(subTask2);
-        manager.addTaskToMap(subTask3);
-        System.out.println("=".repeat(20));
-
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        System.out.println("manager.getTask(3) = " + manager.getTask(3));
-        EpicTask epicTask = (EpicTask) manager.getTask(3);
-        manager.addTaskToMap(epicTask);
-
-        EpicTask updatedEpicTask = epicTask.getCopy();
-        updatedEpicTask.addSubTask(listSubTasksCar.get(0));
-        updatedEpicTask.addSubTask(listSubTasksCar.get(2));
-
-        manager.updateTask(updatedEpicTask, epicTask.getId(), epicTask);
-        System.out.println("manager.getTask(3) = " + manager.getTask(3));
-        epicTask = (EpicTask) manager.getTask(3);
-        SubTask subForDelete = epicTask.getSubTasks().getFirst();
-        updatedEpicTask = epicTask.getCopy();
-        updatedEpicTask.removeSubTask(subForDelete); // updatedEpicTask.removeSubTask(4); / updatedEpicTask.removeSubTask(subForDelete);
-        updatedEpicTask.removeSubTask(99);
-        updatedEpicTask.addSubTask(new SubTask("n", "d", Status.DONE, null, updatedEpicTask.getId()));
-        manager.updateTask(updatedEpicTask, epicTask.getId(), epicTask);
-        System.out.println("manager.getTask(3) = " + manager.getTask(3));
-        System.out.println("Удаление задачи из Epic со статусом NEW");
-        /*
-        Удаление задачи из Epic со статусом NEW
-         */
-        manager.removeTask(5);
-        System.out.println("manager.getTask(3) = " + manager.getTask(3));
-
-
-        System.out.println("===".repeat(3));
-        System.out.println("Добавление Epic с уже готовыми сабтасками");
-        /*
-        Добавление Epic с уже готовыми сабтасками
-         */
-        epicTask2.addSubTask(listSubTasksFlat.get(0));
-        epicTask2.addSubTask(listSubTasksFlat.get(1));
-        epicTask2.addSubTask(listSubTasksFlat.get(2));
-        manager.addTaskToMap(epicTask2);
-        System.out.println("manager.getTask(4) = " + manager.getTask(4));
-
-        System.out.println("===".repeat(3));
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        System.out.println("Удаление id1");
-        /*Удаление id1*/
-        manager.removeTask(1);
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-
-        System.out.println("===".repeat(3));
-        System.out.println("Удаление эпика целиком");
-        // Удаление эпика целиком
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        manager.removeTask(4);
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-
-        System.out.println("===".repeat(3));
-        System.out.println("Добавление новой задачи - должна занять ближайший индекс (1)");
-        // Добавление новой задачи - должна занять ближайший индекс (1)
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        manager.addTaskToMap(new Task("Новая задача", "Должен быть индекс 1"));
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-
-        System.out.println("===".repeat(3));
-        System.out.println("Смена статуса задачи 1");
-        Task task = manager.getTask(1);
-        Task updated = new Task(task.getName(), task.getDescription(), Status.IN_PROGRESS, task.getId());
-        manager.updateTask(updated, task.getId(), task);
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        System.out.println("Очистка хранилища");
-        manager.clearAllTasks();
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        manager.updateTask(updated, task.getId(), task);
-
+        testFromPracticum();
+        System.out.println("*\n".repeat(5));
+        testChangeNameAndDescriptionSingle();
+        System.out.println("*\n".repeat(5));
+        testChangeNameAndDescriptionEpic();
+        System.out.println("*\n".repeat(5));
+        testAddIncompatibleClasses();
+        System.out.println("*\n".repeat(5));
+        testOthers();
     }
 
-    public static void testFromPracticum(Manager manager) {
-        Task task1 = new Task("Задача1", "Описание1");
-        Task task2 = new Task("Задача2", "Описание2");
+    public static void testFromPracticum() {
+        Manager manager = new Manager();
+        SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
+        SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
 
         EpicTask epicTask1 = new EpicTask("Эпик1", "ОписаниеЭпик1");
         EpicTask epicTask2 = new EpicTask("Эпик2", "ОписаниеЭпик2");
 
-        SubTask subTask1 = new SubTask("Субтаск1", "Для эпик1");
-        SubTask subTask2 = new SubTask("Субтаск2", "Для эпик1");
-        SubTask subTask3 = new SubTask("Субтаск3", "Для эпик2");
+        System.out.println("Добавление 2 обычных задач:");
+        manager.addSingleTask(singleTask1);
+        manager.addSingleTask(singleTask2);
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println("===".repeat(3) + "\n");
 
-        manager.addTaskToMap(task1);
-        manager.addTaskToMap(task2);
+        System.out.println("Добавление 2 эпиков:");
+        manager.addEpicTask(epicTask1);
+        manager.addEpicTask(epicTask2);
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
 
-        epicTask1.addSubTask(subTask1);
-        epicTask1.addSubTask(subTask2);
-        manager.addTaskToMap(epicTask1);
+        System.out.println("Добавление подзадач для эпиков:");
+        EpicTask epicTaskReceived1 = manager.getEpicTask(2);
+        EpicTask epicTaskReceived2 = manager.getEpicTask(3);
+        SubTask subTask1 = new SubTask("Субтаск1", "Для эпик1", epicTaskReceived1.getId());
+        SubTask subTask2 = new SubTask("Субтаск2", "Для эпик1", epicTaskReceived1.getId());
+        SubTask subTask3 = new SubTask("Субтаск3", "Для эпик2", epicTaskReceived2.getId());
 
-        manager.addTaskToMap(epicTask2);
+        manager.addSubTask(subTask1);
+        manager.addSubTask(subTask2);
+        manager.addSubTask(subTask3);
+        System.out.println(manager.getAllSubTasks());
+        System.out.println("===".repeat(3) + "\n");
 
-        EpicTask epicGet = (EpicTask) manager.getTask(5);
-        epicGet.addSubTask(subTask3);
-        manager.updateTask(epicGet, 5, manager.getTask(5));
+        System.out.println("Смена статусов");
+        SingleTask singleTaskReceived1 = manager.getSingleTask(0);
+        SingleTask singleTaskReceived2 = manager.getSingleTask(1);
+        singleTaskReceived1.setStatus(Status.IN_PROGRESS);
+        singleTaskReceived2.setStatus(Status.DONE);
 
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        Task single1 = manager.getTask(0);
-        Task single2 = manager.getTask(1);
+        SubTask subTaskReceived1 = manager.getSubTask(4);
+        SubTask subTaskReceived2 = manager.getSubTask(5);
+        SubTask subTaskReceived3 = manager.getSubTask(6);
+        subTaskReceived1.setStatus(Status.IN_PROGRESS);
+        subTaskReceived2.setStatus(Status.DONE);
+        subTaskReceived3.setStatus(Status.DONE);
 
-        Task input1 = new Task(single1.getName(), single1.getDescription(), Status.IN_PROGRESS, single1.getId());
-        Task input2 = new Task(single2.getName(), single2.getDescription(), Status.DONE, single2.getId());
+        System.out.println("До смены:");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
 
-        SubTask sub1 = (SubTask) manager.getTask(4);
-        SubTask sub2 = (SubTask) manager.getTask(6);
+        manager.updateSingleTask(singleTaskReceived1);
+        manager.updateSingleTask(singleTaskReceived2);
+        manager.updateSubTask(subTaskReceived1);
+        manager.updateSubTask(subTaskReceived2);
+        manager.updateSubTask(subTaskReceived3);
 
-        SubTask input3 = new SubTask(sub1.getName(), sub1.getDescription(), Status.IN_PROGRESS, sub1.getId(), sub1.getEpicId());
-        SubTask input4 = new SubTask(sub2.getName(), sub2.getDescription(), Status.DONE, sub2.getId(), sub2.getEpicId());
+        System.out.println("После смены:");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
 
-        manager.updateTask(input1, single1.getId(), single1);
-        manager.updateTask(input2, single2.getId(), single2);
-        manager.updateTask(input3, sub1.getId(), sub1);
-        manager.updateTask(input4, sub2.getId(), sub2);
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
-        manager.removeTask(5);
-        manager.removeTask(0);
-        System.out.println("manager.getAllTasks() = " + manager.getAllTasks());
+        System.out.println("Удаление 1 подзадачи, статус эпика должен измениться:");
+        manager.removeSubTask(4);
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
 
-        manager.clearAllTasks();
+        System.out.println("Удаление 1 сингл и 1 эпика:");
+        manager.removeSingleTask(0);
+        manager.removeEpicTask(2);
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+    }
+
+    public static void testChangeNameAndDescriptionSingle() {
+        Manager manager = new Manager();
+        SingleTask singleTask = new SingleTask("Имя до", "Описание до");
+        manager.addSingleTask(singleTask);
+
+        System.out.println(manager.getAllSingleTasks());
+
+        SingleTask singleTaskReceived = manager.getSingleTask(0);
+        singleTaskReceived.setName("Имя после");
+        singleTaskReceived.setDescription("Описание после");
+        manager.updateSingleTask(singleTaskReceived);
+        System.out.println(manager.getAllSingleTasks());
+    }
+
+    public static void testChangeNameAndDescriptionEpic() {
+        System.out.println("testChangeNameAndDescriptionEpic");
+        Manager manager = new Manager();
+        EpicTask epicTask = new EpicTask("Эпик имя до", "Эпик описание до");
+        manager.addEpicTask(epicTask);
+        SubTask subTask = new SubTask("Суб имя до", "Суб описание до", 0);
+        manager.addSubTask(subTask);
+
+        EpicTask epicTaskReceived = manager.getEpicTask(0);
+        SubTask subTaskReceived = manager.getSubTask(1);
+
+        epicTaskReceived.setName("Эпик имя после");
+        epicTaskReceived.setDescription("Эпик описание после");
+
+        subTaskReceived.setName("Суб имя после");
+        subTaskReceived.setDescription("Суб имя после");
+
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println(manager.getAllSubTasks());
+        manager.updateEpicTask(epicTaskReceived);
+        manager.updateSubTask(subTaskReceived);
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println(manager.getAllSubTasks());
+    }
+
+    public static void testAddIncompatibleClasses() {
+        System.out.println("testAddIncompatibleClasses");
+        Manager manager = new Manager();
+        EpicTask epicTask = new EpicTask("Тест", "тест");
+        manager.addSingleTask(epicTask);
+        System.out.println(manager.getAllSingleTasks());
+    }
+
+    public static void testOthers() {
+        Manager manager = new Manager();
+        SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
+        SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
+
+        EpicTask epicTask1 = new EpicTask("Эпик1", "ОписаниеЭпик1");
+        EpicTask epicTask2 = new EpicTask("Эпик2", "ОписаниеЭпик2");
+
+        System.out.println("Добавление 2 обычных задач:");
+        manager.addSingleTask(singleTask1);
+        manager.addSingleTask(singleTask2);
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+        System.out.println("Добавление 2 эпиков:");
+        manager.addEpicTask(epicTask1);
+        manager.addEpicTask(epicTask2);
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+        System.out.println("Добавление подзадач для эпиков:");
+        EpicTask epicTaskReceived1 = manager.getEpicTask(2);
+        EpicTask epicTaskReceived2 = manager.getEpicTask(3);
+        SubTask subTask1 = new SubTask("Субтаск1", "Для эпик1", epicTaskReceived1.getId());
+        SubTask subTask2 = new SubTask("Субтаск2", "Для эпик1", epicTaskReceived1.getId());
+        SubTask subTask3 = new SubTask("Субтаск3", "Для эпик2", epicTaskReceived2.getId());
+
+        manager.addSubTask(subTask1);
+        manager.addSubTask(subTask2);
+        manager.addSubTask(subTask3);
+        System.out.println(manager.getAllSubTasks());
+        System.out.println("===".repeat(3) + "\n");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+
+        System.out.println("Получение подзадач эпика id=2");
+        System.out.println(manager.getSubTasksFromEpic(2));
+        System.out.println("===".repeat(3) + "\n");
+
+        System.out.println("Удаление подзадач эпика id=2");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("После");
+        manager.clearEpicSubTasks(2);
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+        System.out.println("Удаление всего:");
+        manager.clearEveryTasks();
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+        singleTask1 = new SingleTask("Задача1", "Описание1");
+        singleTask2 = new SingleTask("Задача2", "Описание2");
+        epicTask1 = new EpicTask("Эпик1", "ОписаниеЭпик1");
+        epicTask2 = new EpicTask("Эпик2", "ОписаниеЭпик2");
+
+        manager.addSingleTask(singleTask1);
+        manager.addSingleTask(singleTask2);
+        manager.addEpicTask(epicTask1);
+        manager.addEpicTask(epicTask2);
+        manager.addSubTask(new SubTask("nnn1", "ddd1", 9));
+        manager.addSubTask(new SubTask("nnn2", "ddd2", 9));
+        manager.addSubTask(new SubTask("nnn3", "ddd3", 10));
+
+        System.out.println("Удаление одиночных задач:");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("После");
+        manager.clearAllSingleTasks();
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+        System.out.println("Удаление подзадач:");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("После");
+        manager.clearAllSubTasks();
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
+
+        manager.addSubTask(new SubTask("nnn1", "ddd1", 9));
+        manager.addSubTask(new SubTask("nnn2", "ddd2", 9));
+        manager.addSubTask(new SubTask("nnn3", "ddd3", 10));
+
+        System.out.println("Удаление эпиков:");
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("После");
+        manager.clearAllEpicTasks();
+        System.out.println(manager.getAllSingleTasks());
+        System.out.println(manager.getAllSubTasks());
+        System.out.println(manager.getAllEpicTasks());
+        System.out.println("===".repeat(3) + "\n");
     }
 }

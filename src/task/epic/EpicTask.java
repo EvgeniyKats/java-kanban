@@ -1,102 +1,53 @@
 package task.epic;
 
-import task.Status;
-import task.single.Task;
+import task.single.SingleTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpicTask extends Task {
+public class EpicTask extends SingleTask {
 
-    private final List<SubTask> subTasks;
+    private final List<Integer> subTasksId;
 
     public EpicTask(String name, String description) {
         super(name, description);
-        subTasks = new ArrayList<>();
+        subTasksId = new ArrayList<>();
     }
 
-    public EpicTask(String name, String description, Integer id, List<SubTask> subTasks) {
-        super(name, description, null, id);
-        this.subTasks = subTasks;
+    protected EpicTask(EpicTask epicTask) {
+        super(epicTask);
+        this.subTasksId = epicTask.subTasksId;
     }
 
-    public List<SubTask> getSubTasks() {
-        return new ArrayList<>(subTasks);
+    public List<Integer> getSubTasksId() {
+        return new ArrayList<>(subTasksId);
     }
 
-    public void addSubTask(SubTask subTask) {
-        subTasks.add(subTask);
+    public void addSubTaskId(Integer id) {
+        subTasksId.add(id);
     }
 
-    public void updateSubTask(SubTask subTaskUpdated, SubTask subTaskDeprecated) {
-        removeSubTask(subTaskDeprecated);
-        addSubTask(subTaskUpdated);
+    public void removeSubTaskId(Integer id) {
+        subTasksId.remove(id);
     }
 
-    public void removeSubTask(SubTask subTask) {
-        subTasks.remove(subTask);
-    }
-
-    public void removeSubTask(int id) {
-        for (SubTask subTask : subTasks) {
-            if (subTask.getId().equals(id)) {
-                removeSubTask(subTask);;
-                return;
-            }
-        }
-        System.out.println("SubTask не был удалён, в Epic отсутствует subTask с id=" + id);
+    public void clearSubTasksId() {
+        subTasksId.clear();
     }
 
     @Override
     public EpicTask getCopy() {
-        return new EpicTask(getName(), getDescription(), getId(), getSubTasks());
-    }
-
-    @Override
-    public Status getStatus() {
-        if (subTasks.isEmpty()) return Status.NEW;
-
-        for (SubTask subTask : subTasks) {
-            if (Status.IN_PROGRESS.equals(subTask.getStatus())) {
-                return Status.IN_PROGRESS;
-            }
-        }
-
-        boolean haveNew = false;
-        boolean haveDone = false;
-
-        for (SubTask subTask : subTasks) {
-            if (haveDone && haveNew) {
-                break;
-            }
-
-            if (!haveNew && Status.NEW.equals(subTask.getStatus())) {
-                haveNew = true;
-                continue;
-            }
-
-            if (!haveDone && Status.DONE.equals(subTask.getStatus())) {
-                haveDone = true;
-            }
-        }
-
-        if (haveDone && haveNew) {
-            return Status.IN_PROGRESS;
-        } else if (haveNew) {
-            return Status.NEW;
-        } else {
-            return Status.DONE;
-        }
+        return new EpicTask(this);
     }
 
     @Override
     public String toString() {
         return "EpicTask{" +
-                "name='" + super.getName() + '\'' +
-                ", description='" + super.getDescription() + '\'' +
-                ", id=" + super.getId() +
-                ", status=" + getStatus() +
-                ", subTasks=" + subTasks +
+                "subTasksId=" + subTasksId +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
                 '}';
     }
 }
