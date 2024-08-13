@@ -13,12 +13,11 @@ public class Manager {
     private final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     private final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     private final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
-    private int amountAllTasks = 0;
+    private int idNext = 1;
 
     public boolean addSingleTask(SingleTask singleTask) {
         if ((singleTask.getClass() == SingleTask.class) && !allSingleTasks.containsValue(singleTask)) {
-            singleTask.setId(amountAllTasks);
-            amountAllTasks++;
+            setTaskId(singleTask);
             allSingleTasks.put(singleTask.getId(), singleTask);
             return true;
         } else {
@@ -29,8 +28,7 @@ public class Manager {
     public boolean addSubTask(SubTask subTask) {
         if ((subTask.getClass() == SubTask.class) && !allSubTasks.containsValue(subTask)
                 && allEpicTasks.containsKey(subTask.getEpicId())) {
-            subTask.setId(amountAllTasks);
-            amountAllTasks++;
+            setTaskId(subTask);
             allSubTasks.put(subTask.getId(), subTask);
             EpicTask epicTaskOfSubTask = allEpicTasks.get(subTask.getEpicId());
             epicTaskOfSubTask.addSubTaskId(subTask.getId());
@@ -43,8 +41,7 @@ public class Manager {
 
     public boolean addEpicTask(EpicTask epicTask) {
         if ((epicTask.getClass() == EpicTask.class) && !allEpicTasks.containsValue(epicTask)) {
-            epicTask.setId(amountAllTasks);
-            amountAllTasks++;
+            setTaskId(epicTask);
             allEpicTasks.put(epicTask.getId(), epicTask);
             return true;
         } else {
@@ -164,10 +161,9 @@ public class Manager {
 
     public boolean removeSubTask(int id) {
         if (allSubTasks.containsKey(id)) {
-            SubTask subTask = allSubTasks.get(id);
+            SubTask subTask = allSubTasks.remove(id);
             EpicTask epicTask = allEpicTasks.get(subTask.getEpicId());
             epicTask.removeSubTaskId(subTask.getId());
-            allSubTasks.remove(id);
             updateStatusEpic(epicTask);
             return true;
         } else {
@@ -177,14 +173,13 @@ public class Manager {
 
     public boolean removeEpicTask(int id) {
         if (allEpicTasks.containsKey(id)) {
-            EpicTask epicTask = allEpicTasks.get(id);
+            EpicTask epicTask = allEpicTasks.remove(id);
             List<Integer> subTasksId = epicTask.getSubTasksId();
 
             for (Integer subTaskId : subTasksId) {
                 allSubTasks.remove(subTaskId);
             }
 
-            allEpicTasks.remove(id);
             return true;
         } else {
             return false;
@@ -212,7 +207,6 @@ public class Manager {
     public boolean clearEpicSubTasks(int id) {
         if (allEpicTasks.containsKey(id)) {
             EpicTask epicTask = allEpicTasks.get(id);
-
             List<Integer> subTasksId = epicTask.getSubTasksId();
 
             for (Integer subTaskId : subTasksId) {
@@ -273,5 +267,10 @@ public class Manager {
         } else {
             epicTask.setStatus(Status.DONE);
         }
+    }
+
+    private void setTaskId(SingleTask task) {
+        task.setId(idNext);
+        idNext++;
     }
 }

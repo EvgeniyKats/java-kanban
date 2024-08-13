@@ -3,6 +3,9 @@ import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -38,8 +41,8 @@ public class Main {
         System.out.println("===".repeat(3) + "\n");
 
         System.out.println("Добавление подзадач для эпиков:");
-        EpicTask epicTaskReceived1 = manager.getEpicTask(2);
-        EpicTask epicTaskReceived2 = manager.getEpicTask(3);
+        EpicTask epicTaskReceived1 = manager.getEpicTask(3);
+        EpicTask epicTaskReceived2 = manager.getEpicTask(4);
         SubTask subTask1 = new SubTask("Субтаск1", "Для эпик1", epicTaskReceived1.getId());
         SubTask subTask2 = new SubTask("Субтаск2", "Для эпик1", epicTaskReceived1.getId());
         SubTask subTask3 = new SubTask("Субтаск3", "Для эпик2", epicTaskReceived2.getId());
@@ -51,14 +54,14 @@ public class Main {
         System.out.println("===".repeat(3) + "\n");
 
         System.out.println("Смена статусов");
-        SingleTask singleTaskReceived1 = manager.getSingleTask(0);
-        SingleTask singleTaskReceived2 = manager.getSingleTask(1);
+        SingleTask singleTaskReceived1 = manager.getSingleTask(1);
+        SingleTask singleTaskReceived2 = manager.getSingleTask(2);
         singleTaskReceived1.setStatus(Status.IN_PROGRESS);
         singleTaskReceived2.setStatus(Status.DONE);
 
-        SubTask subTaskReceived1 = manager.getSubTask(4);
-        SubTask subTaskReceived2 = manager.getSubTask(5);
-        SubTask subTaskReceived3 = manager.getSubTask(6);
+        SubTask subTaskReceived1 = manager.getSubTask(5);
+        SubTask subTaskReceived2 = manager.getSubTask(6);
+        SubTask subTaskReceived3 = manager.getSubTask(7);
         subTaskReceived1.setStatus(Status.IN_PROGRESS);
         subTaskReceived2.setStatus(Status.DONE);
         subTaskReceived3.setStatus(Status.DONE);
@@ -81,14 +84,14 @@ public class Main {
         System.out.println("===".repeat(3) + "\n");
 
         System.out.println("Удаление 1 подзадачи, статус эпика должен измениться:");
-        manager.removeSubTask(4);
+        manager.removeSubTask(5);
         System.out.println(manager.getAllSubTasks());
         System.out.println(manager.getAllEpicTasks());
         System.out.println("===".repeat(3) + "\n");
 
         System.out.println("Удаление 1 сингл и 1 эпика:");
-        manager.removeSingleTask(0);
-        manager.removeEpicTask(2);
+        manager.removeSingleTask(1);
+        manager.removeEpicTask(3);
         System.out.println(manager.getAllSingleTasks());
         System.out.println(manager.getAllSubTasks());
         System.out.println(manager.getAllEpicTasks());
@@ -103,7 +106,7 @@ public class Main {
 
         System.out.println(manager.getAllSingleTasks());
 
-        SingleTask singleTaskReceived = manager.getSingleTask(0);
+        SingleTask singleTaskReceived = manager.getSingleTask(1);
         singleTaskReceived.setName("Имя после");
         singleTaskReceived.setDescription("Описание после");
         manager.updateSingleTask(singleTaskReceived);
@@ -115,11 +118,11 @@ public class Main {
         Manager manager = new Manager();
         EpicTask epicTask = new EpicTask("Эпик имя до", "Эпик описание до");
         manager.addEpicTask(epicTask);
-        SubTask subTask = new SubTask("Суб имя до", "Суб описание до", 0);
+        SubTask subTask = new SubTask("Суб имя до", "Суб описание до", 1);
         manager.addSubTask(subTask);
 
-        EpicTask epicTaskReceived = manager.getEpicTask(0);
-        SubTask subTaskReceived = manager.getSubTask(1);
+        EpicTask epicTaskReceived = manager.getEpicTask(1);
+        SubTask subTaskReceived = manager.getSubTask(2);
 
         epicTaskReceived.setName("Эпик имя после");
         epicTaskReceived.setDescription("Эпик описание после");
@@ -164,8 +167,8 @@ public class Main {
         System.out.println("===".repeat(3) + "\n");
 
         System.out.println("Добавление подзадач для эпиков:");
-        EpicTask epicTaskReceived1 = manager.getEpicTask(2);
-        EpicTask epicTaskReceived2 = manager.getEpicTask(3);
+        EpicTask epicTaskReceived1 = manager.getEpicTask(3);
+        EpicTask epicTaskReceived2 = manager.getEpicTask(4);
         SubTask subTask1 = new SubTask("Субтаск1", "Для эпик1", epicTaskReceived1.getId());
         SubTask subTask2 = new SubTask("Субтаск2", "Для эпик1", epicTaskReceived1.getId());
         SubTask subTask3 = new SubTask("Субтаск3", "Для эпик2", epicTaskReceived2.getId());
@@ -180,7 +183,7 @@ public class Main {
         System.out.println(manager.getAllEpicTasks());
 
         System.out.println("Получение подзадач эпика id=2");
-        System.out.println(manager.getSubTasksFromEpic(2));
+        System.out.println(manager.getSubTasksFromEpic(3));
         System.out.println("===".repeat(3) + "\n");
 
         System.out.println("Удаление подзадач эпика id=2");
@@ -188,7 +191,7 @@ public class Main {
         System.out.println(manager.getAllSubTasks());
         System.out.println(manager.getAllEpicTasks());
         System.out.println("После");
-        manager.clearEpicSubTasks(2);
+        manager.clearEpicSubTasks(3);
         System.out.println(manager.getAllSingleTasks());
         System.out.println(manager.getAllSubTasks());
         System.out.println(manager.getAllEpicTasks());
@@ -210,9 +213,9 @@ public class Main {
         manager.addSingleTask(singleTask2);
         manager.addEpicTask(epicTask1);
         manager.addEpicTask(epicTask2);
-        manager.addSubTask(new SubTask("nnn1", "ddd1", 9));
-        manager.addSubTask(new SubTask("nnn2", "ddd2", 9));
-        manager.addSubTask(new SubTask("nnn3", "ddd3", 10));
+        manager.addSubTask(new SubTask("nnn1", "ddd1", 10));
+        manager.addSubTask(new SubTask("nnn2", "ddd2", 10));
+        manager.addSubTask(new SubTask("nnn3", "ddd3", 11));
 
         System.out.println("Удаление одиночных задач:");
         System.out.println(manager.getAllSingleTasks());
@@ -236,9 +239,9 @@ public class Main {
         System.out.println(manager.getAllEpicTasks());
         System.out.println("===".repeat(3) + "\n");
 
-        manager.addSubTask(new SubTask("nnn1", "ddd1", 9));
-        manager.addSubTask(new SubTask("nnn2", "ddd2", 9));
-        manager.addSubTask(new SubTask("nnn3", "ddd3", 10));
+        manager.addSubTask(new SubTask("nnn1", "ddd1", 10));
+        manager.addSubTask(new SubTask("nnn2", "ddd2", 10));
+        manager.addSubTask(new SubTask("nnn3", "ddd3", 11));
 
         System.out.println("Удаление эпиков:");
         System.out.println(manager.getAllSingleTasks());
