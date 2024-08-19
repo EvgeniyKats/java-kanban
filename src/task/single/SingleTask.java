@@ -65,12 +65,12 @@ public class SingleTask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SingleTask singleTask = (SingleTask) o;
-        return Objects.equals(name, singleTask.name) && Objects.equals(description, singleTask.description) && Objects.equals(id, singleTask.id) && status == singleTask.status;
+        return Objects.equals(id, singleTask.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, id, status);
+        return Objects.hashCode(id);
     }
 
     @Override
