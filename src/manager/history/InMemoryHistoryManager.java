@@ -3,14 +3,16 @@ package manager.history;
 import task.single.SingleTask;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<SingleTask> tasks = new ArrayList<>();
+    public static final int MAX_SIZE_LIST = 10;
+    private final List<SingleTask> tasks = new LinkedList<>();
 
     @Override
     public void add(SingleTask task) {
-        if (tasks.size() == 10) {
+        if (tasks.size() == MAX_SIZE_LIST) {
             tasks.removeFirst();
         }
         tasks.add(task);
