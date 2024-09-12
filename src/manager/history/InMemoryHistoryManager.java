@@ -46,6 +46,12 @@ public class InMemoryHistoryManager implements HistoryManager {
         return result;
     }
 
+    public void clearHistory() {
+        tail = null;
+        head = null;
+        tasks.clear();
+    }
+
     private Node linkLastNode(SingleTask task) {
         Node tailOld = tail;
         Node tailNew = new Node(task, tailOld, null);

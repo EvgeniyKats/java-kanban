@@ -40,11 +40,11 @@ public class Main {
         for (SingleTask singleTask : singleTasks) {
             inMemoryTaskManager.getSingleTask(singleTask.getId());
         }
-        for (SubTask subTask : subTasks) {
-            inMemoryTaskManager.getSubTask(subTask.getId());
-        }
         for (EpicTask epicTask : epicTasks) {
             inMemoryTaskManager.getEpicTask(epicTask.getId());
+        }
+        for (SubTask subTask : subTasks) {
+            inMemoryTaskManager.getSubTask(subTask.getId());
         }
         System.out.println(inMemoryTaskManager.getHistory());
 

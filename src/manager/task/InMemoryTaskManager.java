@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-
+    public static int DEFAULT_ID_NEXT = 1;
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     private final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     private final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
-    private int idNext = 1;
+    private int idNext = DEFAULT_ID_NEXT;
 
     @Override
     public boolean addSingleTask(SingleTask singleTask) {
@@ -273,19 +273,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEveryTasks() {
-        for (SingleTask singleTask : allSingleTasks.values()) {
-            historyManager.remove(singleTask.getId());
-        }
-        for (SubTask subTask : allSubTasks.values()) {
-            historyManager.remove(subTask.getId());
-        }
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            historyManager.remove(epicTask.getId());
-        }
-
+        historyManager.clearHistory();
         allSingleTasks.clear();
         allSubTasks.clear();
         allEpicTasks.clear();
+        idNext = DEFAULT_ID_NEXT;
     }
 
     @Override
