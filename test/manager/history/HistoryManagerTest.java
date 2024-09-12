@@ -138,8 +138,6 @@ class HistoryManagerTest {
         assertEquals(received2, history.get(1));
         assertEquals(received4, history.get(2));
 
-        System.out.println(taskManager.getHistory());
-
         taskManager.removeSingleTask(2);
         assertTrue(taskManager.getHistory().contains(received1));
         assertFalse(taskManager.getHistory().contains(received2));

@@ -27,9 +27,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        if (tasks.containsKey(id)) {
-            Node node = tasks.remove(id);
-            removeNode(node);
+        final Node nodeToRemove = tasks.remove(id);
+        if (nodeToRemove != null) {
+            removeNode(nodeToRemove);
         }
     }
 
@@ -38,7 +38,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         List<SingleTask> result = new ArrayList<>(tasks.size());
 
         Node node = head;
-        for (int i = 0; i < tasks.size(); i++) {
+        while (node != null) {
             result.add(node.data.getCopy());
             node = node.next;
         }
@@ -61,35 +61,19 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void removeNode(Node removedNode) {
-        boolean removedNodeWasHead = removedNode.equals(head);
-        boolean removedNodeWasTail = removedNode.equals(tail);
-        Node nextFromRemoved = removedNode.next;
-        Node prevFromRemoved = removedNode.prev;
+        final Node nextFromRemoved = removedNode.next;
+        final Node prevFromRemoved = removedNode.prev;
 
-        if (removedNodeWasHead) {
-            if (nextFromRemoved != null) {
-                nextFromRemoved.prev = null;
-                head = nextFromRemoved;
-            } else {
-                head = null;
-            }
+        if (nextFromRemoved == null) {
+            tail = prevFromRemoved;
+        } else {
+            nextFromRemoved.prev = prevFromRemoved;
         }
-        if (removedNodeWasTail) {
-            if (prevFromRemoved != null) {
-                prevFromRemoved.next = null;
-                tail = prevFromRemoved;
-            } else {
-                tail = null;
-            }
-        }
-        if (!removedNodeWasHead && !removedNodeWasTail) {
-            if (nextFromRemoved != null) {
-                nextFromRemoved.prev = prevFromRemoved;
-            }
 
-            if (prevFromRemoved != null) {
-                prevFromRemoved.next = nextFromRemoved;
-            }
+        if (prevFromRemoved == null) {
+            head = nextFromRemoved;
+        } else {
+            prevFromRemoved.next = nextFromRemoved;
         }
     }
 
