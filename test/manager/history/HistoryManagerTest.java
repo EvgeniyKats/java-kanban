@@ -106,7 +106,6 @@ class HistoryManagerTest {
         }
     }
 
-
     @Test
     void checkOrderOfTasksWithRemoveSingle() {
         SingleTask singleTask1 = new SingleTask("1n", "1d");
@@ -138,7 +137,6 @@ class HistoryManagerTest {
         assertEquals(received1, history.get(0));
         assertEquals(received2, history.get(1));
         assertEquals(received4, history.get(2));
-
 
         System.out.println(taskManager.getHistory());
 
