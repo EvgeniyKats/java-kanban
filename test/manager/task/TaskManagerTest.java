@@ -292,36 +292,33 @@ class TaskManagerTest {
 
     @Test
     void sizeHistoryShouldBe10AfterGet10Tasks() {
-        taskManager.addSingleTask(new SingleTask("name", "desc"));
-
-        for (int i = 0; i < 10; i++) {
-            taskManager.getSingleTask(1);
+        for (int i = 1; i <= 10; i++) {
+            taskManager.addSingleTask(new SingleTask("name", "desc"));
+            taskManager.getSingleTask(i);
         }
 
         List<SingleTask> singleTasks = taskManager.getHistory();
-
-        for (SingleTask singleTask : singleTasks) {
-            assertEquals(1, singleTask.getId());
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i + 1, singleTasks.get(i).getId());
         }
 
         assertEquals(10, singleTasks.size());
     }
 
     @Test
-    void sizeHistoryShouldBe10AfterGet11Tasks() {
-        taskManager.addSingleTask(new SingleTask("name", "desc"));
+    void sizeHistoryShouldBe11AfterGet11Tasks() {
 
-        for (int i = 0; i < 11; i++) {
-            taskManager.getSingleTask(1);
+        for (int i = 1; i <= 11; i++) {
+            taskManager.addSingleTask(new SingleTask("name", "desc"));
+            taskManager.getSingleTask(i);
         }
 
         List<SingleTask> singleTasks = taskManager.getHistory();
-
-        for (SingleTask singleTask : singleTasks) {
-            assertEquals(1, singleTask.getId());
+        for (int i = 0; i < 11; i++) {
+            assertEquals(i + 1, singleTasks.get(i).getId());
         }
 
-        assertEquals(10, singleTasks.size());
+        assertEquals(11, singleTasks.size());
     }
 
     @Test
@@ -332,8 +329,8 @@ class TaskManagerTest {
         SingleTask singleTaskReceived = taskManager.getSingleTask(id);
         singleTaskReceived.setName("newName");
         taskManager.updateSingleTask(singleTaskReceived);
-        assertEquals("newName", taskManager.getSingleTask(id).getName());
         assertEquals("name", taskManager.getHistory().getFirst().getName());
+        assertEquals("newName", taskManager.getSingleTask(id).getName()); // обновит задачу в истории
     }
 
     private void putInManager_2SingleTasks_2EpicTasksWith_2Subtasks() {
