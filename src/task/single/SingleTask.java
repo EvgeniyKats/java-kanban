@@ -1,10 +1,11 @@
 package task.single;
 
 import task.Status;
+import task.Task;
 
 import java.util.Objects;
 
-public class SingleTask {
+public class SingleTask implements Task {
 
     protected String name;
     protected String description;
