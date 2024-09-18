@@ -1,7 +1,5 @@
 package task;
 
-import task.single.Task;
-
 public enum TaskType {
     SINGLE_TASK,
     SUB_TASK,
