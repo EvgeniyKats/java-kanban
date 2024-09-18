@@ -4,6 +4,8 @@ import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
 
+import java.io.IOException;
+
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
     @Override
     public boolean addSingleTask(SingleTask singleTask) {
@@ -91,9 +93,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     private void save() {
         //TODO
+        try {
+
+        } catch (IOException e) {
+            throw new ManagerSaveException(e);
+        }
     }
 
     private void restore() {
         //TODO
+    }
+
+    static class ManagerSaveException extends RuntimeException {
+        public ManagerSaveException(Throwable cause) {
+            super(cause);
+        }
     }
 }
