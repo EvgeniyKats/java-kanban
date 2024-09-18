@@ -5,6 +5,7 @@ import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
 import task.TaskType;
+import task.single.Task;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -28,44 +29,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             String stringOfTasks = Files.readString(path);
             String[] tasksArray = stringOfTasks.split("\n");
 
-            final int idLocation = 0;
-            final int typeLocation = 1;
-            final int nameLocation = 2;
-            final int statusLocation = 3;
-            final int descriptionLocation = 4;
-            final int epicIdLocation = 5;
-
             for (int i = 1; i < tasksArray.length; i++) {
-                String[] taskFields = tasksArray[i].split(",");
-                SingleTask task;
-                String typeS = taskFields[typeLocation];
-
-                if (typeS.equals(TaskType.SINGLE_TASK.toString())) {
-                    task = new SingleTask(taskFields[nameLocation], taskFields[descriptionLocation]);
-                } else if (typeS.equals(TaskType.EPIC_TASK.toString())) {
-                    task = new EpicTask(taskFields[nameLocation], taskFields[descriptionLocation]);
-                } else {
-                    task = new SubTask(taskFields[nameLocation], taskFields[descriptionLocation],
-                            Integer.parseInt(taskFields[epicIdLocation]));
-                }
-                task.setId(Integer.parseInt(taskFields[idLocation]));
-                task.setName(taskFields[nameLocation]);
-                task.setDescription(taskFields[descriptionLocation]);
-
-                Status status;
-                String statusS = taskFields[statusLocation];
-
-                if (statusS.equals(Status.NEW.toString())) {
-                    status = Status.NEW;
-                } else if (statusS.equals(Status.IN_PROGRESS.toString())) {
-                    status = Status.IN_PROGRESS;
-                } else {
-                    status = Status.DONE;
-                }
-                task.setStatus(status);
-
+                Task task = manager.fromString(tasksArray[i]);
                 switch (task.getTaskType()) {
-                    case SINGLE_TASK -> manager.addSingleTask(task);
+                    case SINGLE_TASK -> manager.addSingleTask((SingleTask) task);
                     case EPIC_TASK -> manager.addEpicTask((EpicTask) task);
                     case SUB_TASK -> manager.addSubTask((SubTask) task);
                 }
@@ -169,6 +136,45 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public void clearEveryTasks() {
         super.clearEveryTasks();
         save();
+    }
+
+    private Task fromString(String value) {
+        final int idLocation = 0;
+        final int typeLocation = 1;
+        final int nameLocation = 2;
+        final int statusLocation = 3;
+        final int descriptionLocation = 4;
+        final int epicIdLocation = 5;
+
+        String[] taskFields = value.split(",");
+        SingleTask task;
+        String typeS = taskFields[typeLocation];
+
+        if (typeS.equals(TaskType.SINGLE_TASK.toString())) {
+            task = new SingleTask(taskFields[nameLocation], taskFields[descriptionLocation]);
+        } else if (typeS.equals(TaskType.EPIC_TASK.toString())) {
+            task = new EpicTask(taskFields[nameLocation], taskFields[descriptionLocation]);
+        } else {
+            task = new SubTask(taskFields[nameLocation], taskFields[descriptionLocation],
+                    Integer.parseInt(taskFields[epicIdLocation]));
+        }
+        task.setId(Integer.parseInt(taskFields[idLocation]));
+        task.setName(taskFields[nameLocation]);
+        task.setDescription(taskFields[descriptionLocation]);
+
+        Status status;
+        String statusS = taskFields[statusLocation];
+
+        if (statusS.equals(Status.NEW.toString())) {
+            status = Status.NEW;
+        } else if (statusS.equals(Status.IN_PROGRESS.toString())) {
+            status = Status.IN_PROGRESS;
+        } else {
+            status = Status.DONE;
+        }
+        task.setStatus(status);
+
+        return task;
     }
 
     private void save() {
