@@ -2,6 +2,7 @@ package task.single;
 
 import task.Status;
 import task.TaskType;
+import task.epic.SubTask;
 
 import java.util.Objects;
 
@@ -96,5 +97,21 @@ public class SingleTask implements Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    public String toString(Task task) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(task.getId()).append(",");
+        builder.append(task.getTaskType()).append(",");
+        builder.append(task.getName()).append(",");
+        builder.append(task.getStatus()).append(",");
+        builder.append(task.getDescription()).append(",");
+
+        if (task.getTaskType().equals(TaskType.SUB_TASK)) {
+            SubTask subTask = (SubTask) task;
+            builder.append(subTask.getEpicId());
+        }
+
+        return builder.toString();
     }
 }

@@ -7,8 +7,13 @@ public enum TaskType {
     SUB_TASK,
     EPIC_TASK;
 
-    public String toString(Task task) {
-        //TODO
-        return "";
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        String[] names = name().split("_");
+        for (String name : names) {
+            builder.append(name.charAt(0)).append(name.substring(1).toLowerCase());
+        }
+        return builder.toString();
     }
 }
