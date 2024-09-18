@@ -1,5 +1,6 @@
 package task.epic;
 
+import task.TaskType;
 import task.single.SingleTask;
 
 public class SubTask extends SingleTask {
@@ -7,7 +8,7 @@ public class SubTask extends SingleTask {
     private final Integer epicId;
 
     public SubTask(String name, String description, Integer epicId) {
-        super(name, description);
+        super(name, description, TaskType.SUB_TASK);
         this.epicId = epicId;
     }
 

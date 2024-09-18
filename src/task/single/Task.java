@@ -1,6 +1,7 @@
-package task;
+package task.single;
 
-import task.single.SingleTask;
+import task.Status;
+import task.TaskType;
 
 public interface Task {
     String getName();
@@ -20,4 +21,6 @@ public interface Task {
     void setStatus(Status status);
 
     SingleTask getCopy();
+
+    TaskType getTaskType();
 }

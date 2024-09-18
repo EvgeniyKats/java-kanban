@@ -1,5 +1,6 @@
 package task.epic;
 
+import task.TaskType;
 import task.single.SingleTask;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class EpicTask extends SingleTask {
     private final List<Integer> subTasksId;
 
     public EpicTask(String name, String description) {
-        super(name, description);
+        super(name, description, TaskType.EPIC_TASK);
         subTasksId = new ArrayList<>();
     }
 
