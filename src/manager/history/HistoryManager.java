@@ -1,6 +1,5 @@
 package manager.history;
 
-import task.single.SingleTask;
 import task.single.Task;
 
 import java.util.List;
