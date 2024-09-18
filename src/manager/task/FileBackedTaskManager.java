@@ -4,61 +4,82 @@ import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+
+    private final Path path;
+
+    public FileBackedTaskManager(Path path) {
+        this.path = path;
+    }
+
     @Override
     public boolean addSingleTask(SingleTask singleTask) {
+        boolean result = super.addSingleTask(singleTask);
         save();
-        return super.addSingleTask(singleTask);
+        return result;
     }
 
     @Override
     public boolean addSubTask(SubTask subTask) {
+        boolean result = super.addSubTask(subTask);
         save();
-        return super.addSubTask(subTask);
+        return result;
     }
 
     @Override
     public boolean addEpicTask(EpicTask epicTask) {
+        boolean result = super.addEpicTask(epicTask);
         save();
-        return super.addEpicTask(epicTask);
+        return result;
     }
 
     @Override
     public boolean updateSingleTask(SingleTask singleTask) {
+        boolean result = super.updateSingleTask(singleTask);
         save();
-        return super.updateSingleTask(singleTask);
+        return result;
     }
 
     @Override
     public boolean updateSubTask(SubTask subTask) {
+        boolean result = super.updateSubTask(subTask);
         save();
-        return super.updateSubTask(subTask);
+        return result;
     }
 
     @Override
     public boolean updateEpicTask(EpicTask epicTask) {
+        boolean result = super.updateEpicTask(epicTask);
         save();
-        return super.updateEpicTask(epicTask);
+        return result;
     }
 
     @Override
     public boolean removeSingleTask(int id) {
+        boolean result = super.removeSingleTask(id);
         save();
-        return super.removeSingleTask(id);
+        return result;
     }
 
     @Override
     public boolean removeSubTask(int id) {
+        boolean result = super.removeSubTask(id);
         save();
-        return super.removeSubTask(id);
+        return result;
     }
 
     @Override
     public boolean removeEpicTask(int id) {
+        boolean result = super.removeEpicTask(id);
         save();
-        return super.removeEpicTask(id);
+        return result;
     }
 
     @Override
@@ -81,26 +102,43 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public boolean clearEpicSubTasks(int id) {
+        boolean result = super.clearEpicSubTasks(id);
         save();
-        return super.clearEpicSubTasks(id);
+        return result;
     }
 
     @Override
     public void clearEveryTasks() {
-        save();
         super.clearEveryTasks();
+        save();
     }
 
     private void save() {
-        //TODO
-        try {
+        try (Writer writer = new FileWriter(path.toString(), false); BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+            String title = "id,type,name,status,description,epic";
+            bufferedWriter.write(title + "\n");
+
+            for (SingleTask singleTask : getAllSingleTasks()) {
+                bufferedWriter.write(singleTask.toString(singleTask) + "\n");
+            }
+
+            for (EpicTask epicTask : getAllEpicTasks()) {
+                bufferedWriter.write(epicTask.toString(epicTask) + "\n");
+            }
+
+            for (SubTask subTask : getAllSubTasks()) {
+                bufferedWriter.write(subTask.toString(subTask) + "\n");
+            }
 
         } catch (IOException e) {
             throw new ManagerSaveException(e);
         }
     }
 
-    private void restore() {
+    private static void loadFromFile(Path path) {
         //TODO
     }
 
