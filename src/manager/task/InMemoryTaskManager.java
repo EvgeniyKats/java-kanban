@@ -14,27 +14,27 @@ import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     public static int DEFAULT_ID_NEXT = 1;
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     private final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     private final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
     private int idNext = DEFAULT_ID_NEXT;
 
     @Override
-    public boolean addSingleTask(SingleTask singleTask) {
+    public int addSingleTask(SingleTask singleTask) {
         if ((singleTask.getClass() == SingleTask.class) && !allSingleTasks.containsValue(singleTask)) {
             if (singleTask.getId() == null) {
                 setTaskId(singleTask);
             }
             allSingleTasks.put(singleTask.getId(), singleTask);
-            return true;
+            return singleTask.getId();
         } else {
-            return false;
+            return -1;
         }
     }
 
     @Override
-    public boolean addSubTask(SubTask subTask) {
+    public int addSubTask(SubTask subTask) {
         if ((subTask.getClass() == SubTask.class) && !allSubTasks.containsValue(subTask)
                 && allEpicTasks.containsKey(subTask.getEpicId())) {
             if (subTask.getId() == null) {
@@ -44,22 +44,22 @@ public class InMemoryTaskManager implements TaskManager {
             EpicTask epicTaskOfSubTask = allEpicTasks.get(subTask.getEpicId());
             epicTaskOfSubTask.addSubTaskId(subTask.getId());
             updateStatusEpic(epicTaskOfSubTask);
-            return true;
+            return subTask.getId();
         } else {
-            return false;
+            return -1;
         }
     }
 
     @Override
-    public boolean addEpicTask(EpicTask epicTask) {
+    public int addEpicTask(EpicTask epicTask) {
         if ((epicTask.getClass() == EpicTask.class) && !allEpicTasks.containsValue(epicTask)) {
             if (epicTask.getId() == null) {
                 setTaskId(epicTask);
             }
             allEpicTasks.put(epicTask.getId(), epicTask);
-            return true;
+            return epicTask.getId();
         } else {
-            return false;
+            return -1;
         }
     }
 

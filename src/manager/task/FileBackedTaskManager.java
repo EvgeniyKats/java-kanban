@@ -32,9 +32,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             for (int i = 1; i < tasksArray.length; i++) {
                 Task task = manager.fromString(tasksArray[i]);
                 switch (task.getTaskType()) {
-                    case SINGLE_TASK -> manager.addSingleTask((SingleTask) task);
-                    case EPIC_TASK -> manager.addEpicTask((EpicTask) task);
-                    case SUB_TASK -> manager.addSubTask((SubTask) task);
+                    case SINGLE_TASK -> {
+                        SingleTask singleTask = (SingleTask) task;
+                        manager.addSingleTask(singleTask);
+                        if (!task.getStatus().equals(Status.NEW)) {
+                            manager.historyManager.add(singleTask);
+                        }
+                    }
+                    case EPIC_TASK -> {
+                        EpicTask epicTask = (EpicTask) task;
+                        manager.addEpicTask(epicTask);
+                        if (!task.getStatus().equals(Status.NEW)) {
+                            manager.historyManager.add(epicTask);
+                        }
+                    }
+                    case SUB_TASK -> {
+                        SubTask subTask = (SubTask) task;
+                        manager.addSubTask(subTask);
+                        if (!task.getStatus().equals(Status.NEW)) {
+                            manager.historyManager.add(subTask);
+                        }
+                    }
                 }
             }
 
@@ -45,22 +63,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public boolean addSingleTask(SingleTask singleTask) {
-        boolean result = super.addSingleTask(singleTask);
+    public int addSingleTask(SingleTask singleTask) {
+        int result = super.addSingleTask(singleTask);
         save();
         return result;
     }
 
     @Override
-    public boolean addSubTask(SubTask subTask) {
-        boolean result = super.addSubTask(subTask);
+    public int addSubTask(SubTask subTask) {
+        int result = super.addSubTask(subTask);
         save();
         return result;
     }
 
     @Override
-    public boolean addEpicTask(EpicTask epicTask) {
-        boolean result = super.addEpicTask(epicTask);
+    public int addEpicTask(EpicTask epicTask) {
+        int result = super.addEpicTask(epicTask);
         save();
         return result;
     }

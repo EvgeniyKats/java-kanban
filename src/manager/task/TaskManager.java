@@ -4,15 +4,14 @@ import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
-    boolean addSingleTask(SingleTask singleTask);
+    int addSingleTask(SingleTask singleTask);
 
-    boolean addSubTask(SubTask subTask);
+    int addSubTask(SubTask subTask);
 
-    boolean addEpicTask(EpicTask epicTask);
+    int addEpicTask(EpicTask epicTask);
 
     SingleTask getSingleTask(int id);
 

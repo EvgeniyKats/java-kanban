@@ -1,6 +1,7 @@
 package manager.history;
 
 import task.single.SingleTask;
+import task.single.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void add(SingleTask task) {
+    public void add(Task task) {
         remove(task.getId());
         Node node = linkLastNode(task);
         tasks.put(task.getId(), node);
@@ -52,7 +53,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         tasks.clear();
     }
 
-    private Node linkLastNode(SingleTask task) {
+    private Node linkLastNode(Task task) {
         Node tailOld = tail;
         Node tailNew = new Node(task, tailOld, null);
 
@@ -84,11 +85,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private static class Node {
-        private final SingleTask data;
+        private final Task data;
         private Node prev;
         private Node next;
 
-        public Node(SingleTask data, Node prev, Node next) {
+        public Node(Task data, Node prev, Node next) {
             this.data = data;
             this.prev = prev;
             this.next = next;
