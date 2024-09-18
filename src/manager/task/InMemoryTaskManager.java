@@ -94,8 +94,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SingleTask> getAllSingleTasks() {
-        ArrayList<SingleTask> result = new ArrayList<>();
+    public List<SingleTask> getAllSingleTasks() {
+        List<SingleTask> result = new ArrayList<>();
 
         for (SingleTask singleTask : allSingleTasks.values()) {
             result.add(singleTask.getCopy());
@@ -105,8 +105,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getAllSubTasks() {
-        ArrayList<SubTask> result = new ArrayList<>();
+    public List<SubTask> getAllSubTasks() {
+        List<SubTask> result = new ArrayList<>();
 
         for (SubTask subTask : allSubTasks.values()) {
             result.add(subTask.getCopy());
@@ -116,9 +116,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getSubTasksFromEpic(int epicId) {
+    public List<SubTask> getSubTasksFromEpic(int epicId) {
         if (allEpicTasks.containsKey(epicId)) {
-            ArrayList<SubTask> result = new ArrayList<>();
+            List<SubTask> result = new ArrayList<>();
             EpicTask epicTask = allEpicTasks.get(epicId);
             List<Integer> subTasksId = epicTask.getSubTasksId();
 
@@ -134,8 +134,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<EpicTask> getAllEpicTasks() {
-        ArrayList<EpicTask> result = new ArrayList<>();
+    public List<EpicTask> getAllEpicTasks() {
+        List<EpicTask> result = new ArrayList<>();
 
         for (EpicTask epicTask : allEpicTasks.values()) {
             result.add(epicTask.getCopy());

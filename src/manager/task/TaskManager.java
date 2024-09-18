@@ -20,13 +20,13 @@ public interface TaskManager {
 
     EpicTask getEpicTask(int id);
 
-    ArrayList<SingleTask> getAllSingleTasks();
+    List<SingleTask> getAllSingleTasks();
 
-    ArrayList<SubTask> getAllSubTasks();
+    List<SubTask> getAllSubTasks();
 
-    ArrayList<SubTask> getSubTasksFromEpic(int epicId);
+    List<SubTask> getSubTasksFromEpic(int epicId);
 
-    ArrayList<EpicTask> getAllEpicTasks();
+    List<EpicTask> getAllEpicTasks();
 
     boolean updateSingleTask(SingleTask singleTask);
 
