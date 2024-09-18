@@ -92,21 +92,21 @@ class TaskManagerTest {
     @Test
     void getSingleTaskShouldBeNotNull() {
         putInManager_2SingleTasks_2EpicTasksWith_2Subtasks();
-        ArrayList<SingleTask> singleTasks = taskManager.getAllSingleTasks();
+        List<SingleTask> singleTasks = taskManager.getAllSingleTasks();
         assertNotNull(taskManager.getSingleTask(singleTasks.getFirst().getId()));
     }
 
     @Test
     void getSubTaskShouldBeNotNull() {
         putInManager_2SingleTasks_2EpicTasksWith_2Subtasks();
-        ArrayList<SubTask> subTasks = taskManager.getAllSubTasks();
+        List<SubTask> subTasks = taskManager.getAllSubTasks();
         assertNotNull(taskManager.getSubTask(subTasks.getFirst().getId()));
     }
 
     @Test
     void getEpicTaskShouldBeNotNull() {
         putInManager_2SingleTasks_2EpicTasksWith_2Subtasks();
-        ArrayList<EpicTask> epicTasks = taskManager.getAllEpicTasks();
+        List<EpicTask> epicTasks = taskManager.getAllEpicTasks();
         assertNotNull(taskManager.getEpicTask(epicTasks.getFirst().getId()));
     }
 
@@ -343,7 +343,7 @@ class TaskManagerTest {
         taskManager.addEpicTask(epicTask1);
         taskManager.addEpicTask(epicTask2);
 
-        ArrayList<EpicTask> epicTasks = taskManager.getAllEpicTasks();
+        List<EpicTask> epicTasks = taskManager.getAllEpicTasks();
 
         SubTask sub1Epic1 = new SubTask("nameSub1", "Epic1", epicTasks.get(0).getId());
         SubTask sub2Epic1 = new SubTask("nameSub2", "Epic1", epicTasks.get(0).getId());
