@@ -1,6 +1,5 @@
 package manager.history;
 
-import task.single.SingleTask;
 import task.single.Task;
 
 import java.util.ArrayList;
@@ -35,8 +34,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<SingleTask> getHistory() {
-        List<SingleTask> result = new ArrayList<>(tasks.size());
+    public List<Task> getHistory() {
+        List<Task> result = new ArrayList<>(tasks.size());
 
         Node node = head;
         while (node != null) {

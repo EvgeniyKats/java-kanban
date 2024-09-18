@@ -7,6 +7,7 @@ import task.Status;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 
 import java.util.List;
 
@@ -296,7 +297,7 @@ class TaskManagerTest {
             taskManager.getSingleTask(i);
         }
 
-        List<SingleTask> singleTasks = taskManager.getHistory();
+        List<Task> singleTasks = taskManager.getHistory();
         for (int i = 0; i < 10; i++) {
             assertEquals(i + 1, singleTasks.get(i).getId());
         }
@@ -312,7 +313,7 @@ class TaskManagerTest {
             taskManager.getSingleTask(i);
         }
 
-        List<SingleTask> singleTasks = taskManager.getHistory();
+        List<Task> singleTasks = taskManager.getHistory();
         for (int i = 0; i < 11; i++) {
             assertEquals(i + 1, singleTasks.get(i).getId());
         }

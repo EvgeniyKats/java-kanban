@@ -6,6 +6,7 @@ import task.Status;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -281,7 +282,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<SingleTask> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 

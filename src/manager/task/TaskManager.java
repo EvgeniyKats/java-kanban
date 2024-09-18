@@ -3,6 +3,7 @@ package manager.task;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 
 import java.util.List;
 
@@ -49,5 +50,5 @@ public interface TaskManager {
 
     void clearEveryTasks();
 
-    List<SingleTask> getHistory();
+    List<Task> getHistory();
 }

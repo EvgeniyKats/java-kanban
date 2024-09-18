@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 
 import java.util.List;
 
@@ -133,7 +134,7 @@ class HistoryManagerTest {
         assertFalse(taskManager.getHistory().contains(received3));
         assertTrue(taskManager.getHistory().contains(received4));
 
-        List<SingleTask> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistory();
         assertEquals(received1, history.get(0));
         assertEquals(received2, history.get(1));
         assertEquals(received4, history.get(2));
@@ -247,7 +248,7 @@ class HistoryManagerTest {
         assertTrue(taskManager.getHistory().contains(task5));
         assertTrue(taskManager.getHistory().contains(task6));
 
-        List<SingleTask> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistory();
         assertEquals(task2, history.get(0));
         assertEquals(task5, history.get(1));
         assertEquals(task6, history.get(2));
