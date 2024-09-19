@@ -219,10 +219,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerSaveException(e);
         }
     }
-
-    static class ManagerSaveException extends RuntimeException {
-        public ManagerSaveException(Throwable cause) {
-            super(cause);
-        }
-    }
 }
