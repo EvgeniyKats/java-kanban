@@ -18,48 +18,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final Path path;
 
-    private FileBackedTaskManager(Path path) {
+    private FileBackedTaskManager(Path path, boolean needsToRestoreTasks) {
         this.path = path;
+        if (needsToRestoreTasks) {
+            restoreTasks();
+        }
     }
 
-    public static FileBackedTaskManager loadFromFile(Path path) {
-        FileBackedTaskManager manager = new FileBackedTaskManager(path);
-
-        try {
-            String stringOfTasks = Files.readString(path);
-            String[] tasksArray = stringOfTasks.split("\n");
-
-            for (int i = 1; i < tasksArray.length; i++) {
-                Task task = manager.fromString(tasksArray[i]);
-                switch (task.getTaskType()) {
-                    case SINGLE_TASK -> {
-                        SingleTask singleTask = (SingleTask) task;
-                        manager.addSingleTask(singleTask);
-                        if (!task.getStatus().equals(Status.NEW)) {
-                            manager.historyManager.add(singleTask);
-                        }
-                    }
-                    case EPIC_TASK -> {
-                        EpicTask epicTask = (EpicTask) task;
-                        manager.addEpicTask(epicTask);
-                        if (!task.getStatus().equals(Status.NEW)) {
-                            manager.historyManager.add(epicTask);
-                        }
-                    }
-                    case SUB_TASK -> {
-                        SubTask subTask = (SubTask) task;
-                        manager.addSubTask(subTask);
-                        if (!task.getStatus().equals(Status.NEW)) {
-                            manager.historyManager.add(subTask);
-                        }
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return manager;
+    public static FileBackedTaskManager loadFromFile(Path path, boolean needsToRestoreTasks) {
+        return new FileBackedTaskManager(path, needsToRestoreTasks);
     }
 
     @Override
@@ -156,6 +123,54 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
+    private void restoreTasks() {
+        try {
+            String stringOfTasks = Files.readString(path);
+            String[] tasksArray = stringOfTasks.split("\n");
+
+            for (int i = 1; i < tasksArray.length; i++) {
+                Task task = fromString(tasksArray[i]);
+                switch (task.getTaskType()) {
+                    case SINGLE_TASK -> {
+                        SingleTask singleTask = (SingleTask) task;
+                        allSingleTasks.put(singleTask.getId(), singleTask);
+                        if (!task.getStatus().equals(Status.NEW)) {
+                            historyManager.add(singleTask);
+                        }
+                    }
+                    case EPIC_TASK -> {
+                        EpicTask epicTask = (EpicTask) task;
+                        allEpicTasks.put(epicTask.getId(), epicTask);
+
+                        for (SubTask subTask : allSubTasks.values()) {
+                            if (subTask.getEpicId().equals(epicTask.getId())) {
+                                epicTask.addSubTaskId(subTask.getId());
+                            }
+                        }
+
+                        if (!task.getStatus().equals(Status.NEW)) {
+                            historyManager.add(epicTask);
+                        }
+                    }
+                    case SUB_TASK -> {
+                        SubTask subTask = (SubTask) task;
+                        allSubTasks.put(subTask.getId(), subTask);
+                        EpicTask epicTask = allEpicTasks.get(subTask.getEpicId());
+                        if (epicTask != null) {
+                            epicTask.addSubTaskId(subTask.getId());
+                        }
+                        if (!task.getStatus().equals(Status.NEW)) {
+                            historyManager.add(subTask);
+                        }
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Task fromString(String value) {
         final int idLocation = 0;
         final int typeLocation = 1;
@@ -165,7 +180,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         final int epicIdLocation = 5;
 
         String[] taskFields = value.split(",");
-        SingleTask task;
+        Task task;
         String typeS = taskFields[typeLocation];
 
         if (typeS.equals(TaskType.SINGLE_TASK.toString())) {

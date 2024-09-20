@@ -16,9 +16,9 @@ import java.util.Map;
 public class InMemoryTaskManager implements TaskManager {
     public static int DEFAULT_ID_NEXT = 1;
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-    private final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
-    private final Map<Integer, SubTask> allSubTasks = new HashMap<>();
-    private final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
+    protected final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
+    protected final Map<Integer, SubTask> allSubTasks = new HashMap<>();
+    protected final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
     private int idNext = DEFAULT_ID_NEXT;
 
     @Override
