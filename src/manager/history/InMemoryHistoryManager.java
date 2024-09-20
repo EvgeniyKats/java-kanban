@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final Map<Integer, Node> tasks;
-    private Node head;
-    private Node tail;
+    private final Map<Integer, Node<Task>> tasks;
+    private Node<Task> head;
+    private Node<Task> tail;
 
     public InMemoryHistoryManager() {
         tasks = new HashMap<>();
@@ -21,13 +21,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         remove(task.getId());
-        Node node = linkLastNode(task);
+        Node<Task> node = linkLastNode(task);
         tasks.put(task.getId(), node);
     }
 
     @Override
     public void remove(int id) {
-        final Node nodeToRemove = tasks.remove(id);
+        final Node<Task> nodeToRemove = tasks.remove(id);
         if (nodeToRemove != null) {
             removeNode(nodeToRemove);
         }
@@ -37,7 +37,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         List<Task> result = new ArrayList<>(tasks.size());
 
-        Node node = head;
+        Node<Task> node = head;
         while (node != null) {
             result.add(node.data.getCopy());
             node = node.next;
@@ -52,9 +52,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         tasks.clear();
     }
 
-    private Node linkLastNode(Task task) {
-        Node tailOld = tail;
-        Node tailNew = new Node(task, tailOld, null);
+    private Node<Task> linkLastNode(Task task) {
+        Node<Task> tailOld = tail;
+        Node<Task> tailNew = new Node<>(task, tailOld, null);
 
         if (tailOld == null) {
             head = tailNew;
@@ -66,9 +66,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tailNew;
     }
 
-    private void removeNode(Node removedNode) {
-        final Node nextFromRemoved = removedNode.next;
-        final Node prevFromRemoved = removedNode.prev;
+    private void removeNode(Node<Task> removedNode) {
+        final Node<Task> nextFromRemoved = removedNode.next;
+        final Node<Task> prevFromRemoved = removedNode.prev;
 
         if (nextFromRemoved == null) {
             tail = prevFromRemoved;
@@ -83,12 +83,12 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    private static class Node {
-        private final Task data;
-        private Node prev;
-        private Node next;
+    private static class Node<E extends Task> {
+        private final E data;
+        private Node<E> prev;
+        private Node<E> next;
 
-        public Node(Task data, Node prev, Node next) {
+        public Node(E data, Node<E> prev, Node<E> next) {
             this.data = data;
             this.prev = prev;
             this.next = next;
