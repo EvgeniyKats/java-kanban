@@ -3,10 +3,10 @@ package manager.task;
 import manager.Managers;
 import org.junit.jupiter.api.BeforeEach;
 
-class InMemoryTaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
+class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManager> {
 
     @BeforeEach
     public void beforeEach() {
-        taskManager = Managers.getDefault();
+        taskManager = (InMemoryTaskManager) Managers.getDefault();
     }
 }

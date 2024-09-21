@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
+class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskManager> {
 
     Path path;
 
@@ -24,7 +24,7 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
     public void beforeEach() {
         try {
             path = Files.createTempFile("test", ".csv");
-            taskManager = Managers.getFileBackendTaskManager(path, true);
+            taskManager = (FileBackedTaskManager) Managers.getFileBackendTaskManager(path, true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +82,7 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
         manager.addSubTask(subTask2);
         manager.addSubTask(subTask3);
 
-        taskManager = Managers.getFileBackendTaskManager(path, true);
+        taskManager = (FileBackedTaskManager) Managers.getFileBackendTaskManager(path, true);
         List<SingleTask> singleTasks = manager.getAllSingleTasks();
         List<SingleTask> singleTasks2 = taskManager.getAllSingleTasks();
 
@@ -186,5 +186,15 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
                 assertTrue(tasksFromHistory.contains(task));
             }
         }
+    }
+
+    @Test
+    void shouldBeEmptyIfWithoutLoad() {
+        taskManager.addSingleTask(new SingleTask("", ""));
+
+        TaskManager withLoad = Managers.getFileBackendTaskManager(path, true);
+        TaskManager withoutLoad = Managers.getFileBackendTaskManager(path, false);
+        assertEquals(1, withLoad.getAllSingleTasks().size());
+        assertEquals(0, withoutLoad.getAllSingleTasks().size());
     }
 }

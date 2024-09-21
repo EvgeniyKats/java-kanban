@@ -179,7 +179,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         final int descriptionLocation = 4;
         final int epicIdLocation = 5;
 
-        String[] taskFields = value.split(",");
+        String[] taskFields = value.split(",", -1);
         Task task;
         String typeS = taskFields[typeLocation];
 
