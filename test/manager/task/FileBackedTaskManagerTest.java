@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest extends TaskManagerTest {
+class FileBackedTaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
 
     Path path;
 
@@ -24,7 +24,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
     public void beforeEach() {
         try {
             path = Files.createTempFile("test", ".csv");
-            taskManager = Managers.getFileBackendTaskManager(path);
+            taskManager = Managers.getFileBackendTaskManager(path, true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +57,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        TaskManager manager = Managers.getFileBackendTaskManager(path);
+        TaskManager manager = Managers.getFileBackendTaskManager(path, false);
         SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
         SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
 
@@ -82,19 +82,19 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         manager.addSubTask(subTask2);
         manager.addSubTask(subTask3);
 
-        TaskManager manager2 = Managers.getFileBackendTaskManager(path);
+        taskManager = Managers.getFileBackendTaskManager(path, true);
         List<SingleTask> singleTasks = manager.getAllSingleTasks();
-        List<SingleTask> singleTasks2 = manager2.getAllSingleTasks();
+        List<SingleTask> singleTasks2 = taskManager.getAllSingleTasks();
 
         assertEquals(singleTasks, singleTasks2);
 
         List<EpicTask> epicTasks = manager.getAllEpicTasks();
-        List<EpicTask> epicTasks2 = manager2.getAllEpicTasks();
+        List<EpicTask> epicTasks2 = taskManager.getAllEpicTasks();
 
         assertEquals(epicTasks, epicTasks2);
 
         List<SubTask> subTasks = manager.getAllSubTasks();
-        List<SubTask> subTasks2 = manager2.getAllSubTasks();
+        List<SubTask> subTasks2 = taskManager.getAllSubTasks();
 
         assertEquals(subTasks, subTasks2);
     }
@@ -107,7 +107,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        TaskManager manager = Managers.getFileBackendTaskManager(path);
+        TaskManager manager = Managers.getFileBackendTaskManager(path, false);
         SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
         SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
         SingleTask singleTask3 = new SingleTask("Задача3", "Описание3");
@@ -145,7 +145,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         manager.updateSubTask(receivedSubTasks.get(1));
         manager.updateSubTask(receivedSubTasks.get(2));
 
-        TaskManager manager2 = Managers.getFileBackendTaskManager(path);
+        TaskManager manager2 = Managers.getFileBackendTaskManager(path, true);
         List<SingleTask> singleTasks = manager.getAllSingleTasks();
         List<SingleTask> singleTasks2 = manager2.getAllSingleTasks();
 

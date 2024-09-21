@@ -18,7 +18,7 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        TaskManager manager = Managers.getFileBackendTaskManager(path);
+        TaskManager manager = Managers.getFileBackendTaskManager(path, false);
         SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
         SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
 
@@ -43,7 +43,7 @@ public class Main {
         manager.addSubTask(subTask2);
         manager.addSubTask(subTask3);
 
-        TaskManager manager2 = Managers.getFileBackendTaskManager(path);
+        TaskManager manager2 = Managers.getFileBackendTaskManager(path, true);
         List<SingleTask> singleTasks = manager.getAllSingleTasks();
         List<SingleTask> singleTasks2 = manager2.getAllSingleTasks();
 

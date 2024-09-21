@@ -21,7 +21,7 @@ public class Managers {
         return new InMemoryHistoryManager();
     }
 
-    public static FileBackedTaskManager getFileBackendTaskManager(Path path) {
-        return FileBackedTaskManager.loadFromFile(path, true);
+    public static TaskManager getFileBackendTaskManager(Path path, boolean needsToRestoreTasks) {
+        return FileBackedTaskManager.loadFromFile(path, needsToRestoreTasks);
     }
 }

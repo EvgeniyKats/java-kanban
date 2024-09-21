@@ -1,7 +1,5 @@
 package manager.task;
 
-import manager.Managers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Status;
 import task.epic.EpicTask;
@@ -12,15 +10,11 @@ import task.single.Task;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TaskManagerTest {
+public abstract class AbstractTaskManagerTest<T extends TaskManager> {
 
-    TaskManager taskManager = Managers.getDefault();
-
-    @BeforeEach
-    public void beforeEach() {
-        taskManager = Managers.getDefault();
-    }
+    protected T taskManager;
 
     @Test
     void shouldBeAddedSingleTask() {
@@ -355,4 +349,5 @@ class TaskManagerTest {
         taskManager.addSubTask(sub1Epic2);
         taskManager.addSubTask(sub2Epic2);
     }
+
 }

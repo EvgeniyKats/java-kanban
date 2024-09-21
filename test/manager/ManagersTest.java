@@ -22,7 +22,7 @@ class ManagersTest {
     @Test
     void getFileBackendTaskManager() {
         try {
-            assertNotNull(Managers.getFileBackendTaskManager(Files.createTempFile("test", ".csv")));
+            assertNotNull(Managers.getFileBackendTaskManager(Files.createTempFile("test", ".csv"), true));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
