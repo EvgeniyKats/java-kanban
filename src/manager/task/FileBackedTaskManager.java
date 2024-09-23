@@ -128,8 +128,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String stringOfTasks = Files.readString(path);
             String[] tasksArray = stringOfTasks.split("\n");
 
+            int maxId = 0;
+
             for (int i = 1; i < tasksArray.length; i++) {
                 Task task = fromString(tasksArray[i]);
+                if (maxId < task.getId()) {
+                    maxId = task.getId();
+                }
+
                 switch (task.getTaskType()) {
                     case SINGLE_TASK -> {
                         SingleTask singleTask = (SingleTask) task;
@@ -155,6 +161,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 }
             }
+
+            idNext = maxId + 1;
 
         } catch (IOException e) {
             throw new RuntimeException(e);

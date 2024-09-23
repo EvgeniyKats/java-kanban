@@ -19,7 +19,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     protected final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     protected final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
-    private int idNext = DEFAULT_ID_NEXT;
+    protected int idNext = DEFAULT_ID_NEXT;
 
     @Override
     public int addSingleTask(SingleTask singleTask) {

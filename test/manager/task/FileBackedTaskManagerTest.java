@@ -7,7 +7,6 @@ import task.Status;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
-import task.single.Task;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +30,7 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
     }
 
     @Test
-    public void saveCheckNotEmpty() {
+    public void pathShouldBeNotEmpty() {
         try {
             assertEquals("", Files.readString(path));
         } catch (IOException e) {
@@ -160,6 +159,23 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         List<SubTask> subTasks2 = manager2.getAllSubTasks();
 
         assertEquals(subTasks, subTasks2);
+    }
+
+    @Test
+    void taskIdShouldBe1AfterLoadWithoutTasks() {
+        TaskManager taskManager1 = Managers.getFileBackendTaskManager(path, false);
+        SingleTask task = new SingleTask("", "");
+        int id = taskManager1.addSingleTask(task);
+        assertEquals(1, id);
+    }
+
+    @Test
+    void taskIdShouldBe2AfterLoadWithOneTask() {
+        taskManager.addSingleTask(new SingleTask("", ""));
+        TaskManager taskManager1 = Managers.getFileBackendTaskManager(path, true);
+        SingleTask task = new SingleTask("", "");
+        int id = taskManager1.addSingleTask(task);
+        assertEquals(2, id);
     }
 
     @Test
