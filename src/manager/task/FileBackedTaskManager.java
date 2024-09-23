@@ -134,9 +134,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case SINGLE_TASK -> {
                         SingleTask singleTask = (SingleTask) task;
                         allSingleTasks.put(singleTask.getId(), singleTask);
-                        if (!task.getStatus().equals(Status.NEW)) {
-                            historyManager.add(singleTask);
-                        }
                     }
                     case EPIC_TASK -> {
                         EpicTask epicTask = (EpicTask) task;
@@ -147,10 +144,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 epicTask.addSubTaskId(subTask.getId());
                             }
                         }
-
-                        if (!task.getStatus().equals(Status.NEW)) {
-                            historyManager.add(epicTask);
-                        }
                     }
                     case SUB_TASK -> {
                         SubTask subTask = (SubTask) task;
@@ -158,9 +151,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         EpicTask epicTask = allEpicTasks.get(subTask.getEpicId());
                         if (epicTask != null) {
                             epicTask.addSubTaskId(subTask.getId());
-                        }
-                        if (!task.getStatus().equals(Status.NEW)) {
-                            historyManager.add(subTask);
                         }
                     }
                 }

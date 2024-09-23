@@ -160,32 +160,6 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         List<SubTask> subTasks2 = manager2.getAllSubTasks();
 
         assertEquals(subTasks, subTasks2);
-
-        List<Task> tasksFromHistory = manager2.getHistory();
-
-        for (Task task : singleTasks2) {
-            if (task.getStatus().equals(Status.NEW)) {
-                assertFalse(tasksFromHistory.contains(task));
-            } else {
-                assertTrue(tasksFromHistory.contains(task));
-            }
-        }
-
-        for (Task task : epicTasks2) {
-            if (task.getStatus().equals(Status.NEW)) {
-                assertFalse(tasksFromHistory.contains(task));
-            } else {
-                assertTrue(tasksFromHistory.contains(task));
-            }
-        }
-
-        for (Task task : subTasks2) {
-            if (task.getStatus().equals(Status.NEW)) {
-                assertFalse(tasksFromHistory.contains(task));
-            } else {
-                assertTrue(tasksFromHistory.contains(task));
-            }
-        }
     }
 
     @Test
