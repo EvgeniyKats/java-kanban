@@ -1,23 +1,35 @@
 package task.single;
 
 import task.Status;
+import task.TaskType;
+import task.epic.SubTask;
 
 import java.util.Objects;
 
-public class SingleTask {
+public class SingleTask implements Task {
 
+    protected final TaskType taskType;
     protected String name;
     protected String description;
     protected Integer id;
     protected Status status;
 
     public SingleTask(String name, String description) {
+        taskType = TaskType.SINGLE_TASK;
+        this.name = name;
+        this.description = description;
+        this.status = Status.NEW;
+    }
+
+    protected SingleTask(String name, String description, TaskType taskType) {
+        this.taskType = taskType;
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
     }
 
     protected SingleTask(SingleTask singleTask) {
+        taskType = singleTask.getTaskType();
         this.name = singleTask.name;
         this.description = singleTask.description;
         this.status = singleTask.status;
@@ -60,6 +72,10 @@ public class SingleTask {
         return new SingleTask(this);
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -81,5 +97,21 @@ public class SingleTask {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    public String toString(Task task) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(task.getId()).append(",");
+        builder.append(task.getTaskType()).append(",");
+        builder.append(task.getName()).append(",");
+        builder.append(task.getStatus()).append(",");
+        builder.append(task.getDescription()).append(",");
+
+        if (task.getTaskType().equals(TaskType.SUB_TASK)) {
+            SubTask subTask = (SubTask) task;
+            builder.append(subTask.getEpicId());
+        }
+
+        return builder.toString();
     }
 }

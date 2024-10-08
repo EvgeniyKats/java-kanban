@@ -3,16 +3,16 @@ package manager.task;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
-    boolean addSingleTask(SingleTask singleTask);
+    int addSingleTask(SingleTask singleTask);
 
-    boolean addSubTask(SubTask subTask);
+    int addSubTask(SubTask subTask);
 
-    boolean addEpicTask(EpicTask epicTask);
+    int addEpicTask(EpicTask epicTask);
 
     SingleTask getSingleTask(int id);
 
@@ -20,13 +20,13 @@ public interface TaskManager {
 
     EpicTask getEpicTask(int id);
 
-    ArrayList<SingleTask> getAllSingleTasks();
+    List<SingleTask> getAllSingleTasks();
 
-    ArrayList<SubTask> getAllSubTasks();
+    List<SubTask> getAllSubTasks();
 
-    ArrayList<SubTask> getSubTasksFromEpic(int epicId);
+    List<SubTask> getSubTasksFromEpic(int epicId);
 
-    ArrayList<EpicTask> getAllEpicTasks();
+    List<EpicTask> getAllEpicTasks();
 
     boolean updateSingleTask(SingleTask singleTask);
 
@@ -50,5 +50,5 @@ public interface TaskManager {
 
     void clearEveryTasks();
 
-    List<SingleTask> getHistory();
+    List<Task> getHistory();
 }

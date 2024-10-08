@@ -1,31 +1,25 @@
 package manager.task;
 
-import manager.Managers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Status;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TaskManagerTest {
+public abstract class AbstractTaskManagerTest<T extends TaskManager> {
 
-    TaskManager taskManager = Managers.getDefault();
-
-    @BeforeEach
-    public void beforeEach() {
-        taskManager = Managers.getDefault();
-    }
+    protected T taskManager;
 
     @Test
     void shouldBeAddedSingleTask() {
         SingleTask singleTask = new SingleTask("singleName", "singleDescription");
-        assertTrue(taskManager.addSingleTask(singleTask));
+        assertNotEquals(-1, taskManager.addSingleTask(singleTask));
     }
 
     @Test
@@ -35,45 +29,45 @@ class TaskManagerTest {
         taskManager.addSingleTask(singleTask);
 
         SingleTask singleTaskReceived = taskManager.getAllSingleTasks().getFirst();
-        assertFalse(taskManager.addSingleTask(singleTaskReceived));
+        assertEquals(-1, taskManager.addSingleTask(singleTaskReceived));
         singleTaskReceived.setId(2);
-        assertTrue(taskManager.addSingleTask(singleTaskReceived));
+        assertNotEquals(-1, taskManager.addSingleTask(singleTaskReceived));
     }
 
     @Test
     void shouldBeNotAddedEpicTaskToSingleTask() {
         EpicTask epicTask = new EpicTask("epic", "epic");
-        assertFalse(taskManager.addSingleTask(epicTask));
+        assertEquals(-1, taskManager.addSingleTask(epicTask));
     }
 
     @Test
     void shouldBeNotDoubleAddedEpic() {
         EpicTask epicTask = new EpicTask("epic", "epic");
-        assertTrue(taskManager.addEpicTask(epicTask));
+        assertNotEquals(-1, taskManager.addEpicTask(epicTask));
         EpicTask epicTaskReceived = taskManager.getAllEpicTasks().getFirst();
-        assertFalse(taskManager.addEpicTask(epicTaskReceived));
+        assertEquals(-1, taskManager.addEpicTask(epicTaskReceived));
     }
 
     @Test
     void shouldBeNotAddedSubTaskWithoutEpic() {
         SubTask subTask = new SubTask("subtaskName", "subtaskDescription", null);
-        assertFalse(taskManager.addSubTask(subTask));
+        assertEquals(-1, taskManager.addSubTask(subTask));
         subTask = new SubTask("subtaskName", "subtaskDescription", 1);
-        assertFalse(taskManager.addSubTask(subTask));
+        assertEquals(-1, taskManager.addSubTask(subTask));
     }
 
     @Test
     void shouldBeAddedSubTaskWithEpic() {
         EpicTask epicTask = new EpicTask("epicName", "epicDescription");
-        assertTrue(taskManager.addEpicTask(epicTask));
+        assertNotEquals(-1, taskManager.addEpicTask(epicTask));
         SubTask subTask = new SubTask("subtaskName", "subtaskDescription", 1);
-        assertTrue(taskManager.addSubTask(subTask));
+        assertNotEquals(-1, taskManager.addSubTask(subTask));
     }
 
     @Test
     void shouldBeAddedEpicTask() {
         EpicTask epicTask = new EpicTask("epicName", "epicDescription");
-        assertTrue(taskManager.addEpicTask(epicTask));
+        assertNotEquals(-1, taskManager.addEpicTask(epicTask));
     }
 
     @Test
@@ -92,21 +86,21 @@ class TaskManagerTest {
     @Test
     void getSingleTaskShouldBeNotNull() {
         putInManager_2SingleTasks_2EpicTasksWith_2Subtasks();
-        ArrayList<SingleTask> singleTasks = taskManager.getAllSingleTasks();
+        List<SingleTask> singleTasks = taskManager.getAllSingleTasks();
         assertNotNull(taskManager.getSingleTask(singleTasks.getFirst().getId()));
     }
 
     @Test
     void getSubTaskShouldBeNotNull() {
         putInManager_2SingleTasks_2EpicTasksWith_2Subtasks();
-        ArrayList<SubTask> subTasks = taskManager.getAllSubTasks();
+        List<SubTask> subTasks = taskManager.getAllSubTasks();
         assertNotNull(taskManager.getSubTask(subTasks.getFirst().getId()));
     }
 
     @Test
     void getEpicTaskShouldBeNotNull() {
         putInManager_2SingleTasks_2EpicTasksWith_2Subtasks();
-        ArrayList<EpicTask> epicTasks = taskManager.getAllEpicTasks();
+        List<EpicTask> epicTasks = taskManager.getAllEpicTasks();
         assertNotNull(taskManager.getEpicTask(epicTasks.getFirst().getId()));
     }
 
@@ -297,7 +291,7 @@ class TaskManagerTest {
             taskManager.getSingleTask(i);
         }
 
-        List<SingleTask> singleTasks = taskManager.getHistory();
+        List<Task> singleTasks = taskManager.getHistory();
         for (int i = 0; i < 10; i++) {
             assertEquals(i + 1, singleTasks.get(i).getId());
         }
@@ -313,7 +307,7 @@ class TaskManagerTest {
             taskManager.getSingleTask(i);
         }
 
-        List<SingleTask> singleTasks = taskManager.getHistory();
+        List<Task> singleTasks = taskManager.getHistory();
         for (int i = 0; i < 11; i++) {
             assertEquals(i + 1, singleTasks.get(i).getId());
         }
@@ -343,7 +337,7 @@ class TaskManagerTest {
         taskManager.addEpicTask(epicTask1);
         taskManager.addEpicTask(epicTask2);
 
-        ArrayList<EpicTask> epicTasks = taskManager.getAllEpicTasks();
+        List<EpicTask> epicTasks = taskManager.getAllEpicTasks();
 
         SubTask sub1Epic1 = new SubTask("nameSub1", "Epic1", epicTasks.get(0).getId());
         SubTask sub2Epic1 = new SubTask("nameSub2", "Epic1", epicTasks.get(0).getId());
@@ -355,4 +349,5 @@ class TaskManagerTest {
         taskManager.addSubTask(sub1Epic2);
         taskManager.addSubTask(sub2Epic2);
     }
+
 }
