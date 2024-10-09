@@ -8,10 +8,7 @@ import task.epic.SubTask;
 import task.single.SingleTask;
 import task.single.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     public static int DEFAULT_ID_NEXT = 1;
@@ -19,6 +16,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     protected final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     protected final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
+    protected final Map<Long, Long> startAndEndTimeInMinutes = new TreeMap<>();
     protected int idNext = DEFAULT_ID_NEXT;
 
     @Override
@@ -326,6 +324,15 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             epicTask.setStatus(Status.DONE);
         }
+    }
+
+    private boolean isValidTaskTime(Task task) {
+        //TODO
+        return false;
+    }
+
+    private void updateEndTimeEpic(EpicTask epicTask) {
+        //TODO
     }
 
     private void setTaskId(SingleTask task) {
