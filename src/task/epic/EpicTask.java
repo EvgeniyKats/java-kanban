@@ -3,12 +3,14 @@ package task.epic;
 import task.TaskType;
 import task.single.SingleTask;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EpicTask extends SingleTask {
 
     private final List<Integer> subTasksId;
+    private LocalDateTime endTime;
 
     public EpicTask(String name, String description) {
         super(name, description, TaskType.EPIC_TASK);
@@ -34,6 +36,15 @@ public class EpicTask extends SingleTask {
 
     public void clearSubTasksId() {
         subTasksId.clear();
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override
