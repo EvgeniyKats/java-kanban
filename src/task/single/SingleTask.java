@@ -135,6 +135,17 @@ public class SingleTask implements Task {
     }
 
     @Override
+    public int compareTo(Task o) {
+        if (startTime.isAfter(o.getStartTime())) {
+            return 1;
+        } else if (startTime.isBefore(o.getStartTime())) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

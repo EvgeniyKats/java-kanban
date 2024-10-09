@@ -6,7 +6,7 @@ import task.TaskType;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public interface Task {
+public interface Task extends Comparable<Task> {
     String getName();
 
     String getDescription();
@@ -35,5 +35,5 @@ public interface Task {
 
     void setDuration(Duration duration);
 
-    public LocalDateTime getEndTime();
+    LocalDateTime getEndTime();
 }

@@ -5,6 +5,7 @@ import manager.history.InMemoryHistoryManager;
 import manager.task.FileBackedTaskManager;
 import manager.task.InMemoryTaskManager;
 import manager.task.TaskManager;
+import manager.task.TaskPriorityManager;
 
 import java.nio.file.Path;
 
@@ -23,5 +24,9 @@ public class Managers {
 
     public static TaskManager getFileBackendTaskManager(Path path, boolean needsToRestoreTasks) {
         return FileBackedTaskManager.loadFromFile(path, needsToRestoreTasks);
+    }
+
+    public static TaskPriorityManager getTaskPriorityManager() {
+        return TaskPriorityManager.createTaskPriorityManager();
     }
 }
