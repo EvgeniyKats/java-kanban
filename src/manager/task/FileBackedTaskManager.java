@@ -146,13 +146,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case EPIC_TASK -> {
                         EpicTask epicTask = (EpicTask) task;
                         allEpicTasks.put(epicTask.getId(), epicTask);
-
-                        for (SubTask subTask : allSubTasks.values()) {
-                            if (subTask.getEpicId().equals(epicTask.getId())) {
-                                epicTask.addSubTaskId(subTask.getId());
-                            }
-                        }
-
+                        allSubTasks.values().stream()
+                                .filter(subTask -> subTask.getId().equals(epicTask.getId()))
+                                .forEach(subTask -> epicTask.addSubTaskId(subTask.getId()));
                     }
                     case SUB_TASK -> {
                         SubTask subTask = (SubTask) task;
