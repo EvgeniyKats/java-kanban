@@ -283,6 +283,11 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return taskPriorityManager.getPrioritizedTasks();
+    }
+
     private void updateStatusEpic(EpicTask epicTask) {
         List<Integer> subTasksId = epicTask.getSubTasksId();
 

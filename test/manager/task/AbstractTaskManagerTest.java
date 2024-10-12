@@ -550,6 +550,36 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         assertFalse(taskManager.updateSubTask(task3));
     }
 
+    @Test
+    void shouldBeSuccessAdded1TaskWithSetTime() {
+        SingleTask task1 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                5), Duration.ofMinutes(1));
+        SingleTask task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+
+        SingleTask task3 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                10), Duration.ofMinutes(1));
+
+        int id1 = taskManager.addSingleTask(task1);
+        int id2 = taskManager.addSingleTask(task2);
+        int id3 = taskManager.addSingleTask(task3);
+
+        List<Task> tasks = taskManager.getPrioritizedTasks();
+        assertEquals(3, tasks.size());
+        assertEquals(taskManager.getSingleTask(id1), tasks.get(1));
+        assertEquals(taskManager.getSingleTask(id2), tasks.get(0));
+        assertEquals(taskManager.getSingleTask(id3), tasks.get(2));
+    }
+
     private void putInManager_2SingleTasks_2EpicTasksWith_2Subtasks() {
         SingleTask singleTask1 = new SingleTask("nameSingle1", "descriptionSingle1");
         SingleTask singleTask2 = new SingleTask("nameSingle2", "descriptionSingle2");
@@ -572,5 +602,4 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         taskManager.addSubTask(sub1Epic2);
         taskManager.addSubTask(sub2Epic2);
     }
-
 }
