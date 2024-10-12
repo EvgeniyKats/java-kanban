@@ -223,4 +223,9 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         assertEquals(1, withLoad.getAllSingleTasks().size());
         assertEquals(0, withoutLoad.getAllSingleTasks().size());
     }
+
+    @Test
+    void testManagerSaveException() {
+        assertThrows(ManagerSaveException.class, () -> {throw new ManagerSaveException(new IOException());});
+    }
 }
