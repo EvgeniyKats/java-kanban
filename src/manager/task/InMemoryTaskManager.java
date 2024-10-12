@@ -9,6 +9,7 @@ import task.single.SingleTask;
 import task.single.Task;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     public static int DEFAULT_ID_NEXT = 1;
@@ -105,39 +106,25 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<SingleTask> getAllSingleTasks() {
-        List<SingleTask> result = new ArrayList<>();
-
-        for (SingleTask singleTask : allSingleTasks.values()) {
-            result.add(singleTask.getCopy());
-        }
-
-        return result;
+        return allSingleTasks.values().stream()
+                .map(SingleTask::getCopy)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<SubTask> getAllSubTasks() {
-        List<SubTask> result = new ArrayList<>();
-
-        for (SubTask subTask : allSubTasks.values()) {
-            result.add(subTask.getCopy());
-        }
-
-        return result;
+        return allSubTasks.values().stream()
+                .map(SubTask::getCopy)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<SubTask> getSubTasksFromEpic(int epicId) {
         if (allEpicTasks.containsKey(epicId)) {
-            List<SubTask> result = new ArrayList<>();
-            EpicTask epicTask = allEpicTasks.get(epicId);
-            List<Integer> subTasksId = epicTask.getSubTasksId();
-
-            for (Integer subTaskId : subTasksId) {
-                SubTask subTask = allSubTasks.get(subTaskId);
-                result.add(subTask.getCopy());
-            }
-
-            return result;
+            return allEpicTasks.get(epicId).getSubTasksId().stream()
+                    .map(allSubTasks::get)
+                    .map(SubTask::getCopy)
+                    .collect(Collectors.toList());
         } else {
             return null;
         }
@@ -145,13 +132,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<EpicTask> getAllEpicTasks() {
-        List<EpicTask> result = new ArrayList<>();
-
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            result.add(epicTask.getCopy());
-        }
-
-        return result;
+        return allEpicTasks.values().stream()
+                .map(EpicTask::getCopy)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -228,14 +211,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (allEpicTasks.containsKey(id)) {
             EpicTask epicTask = allEpicTasks.remove(id);
             historyManager.remove(id);
-            List<Integer> subTasksId = epicTask.getSubTasksId();
-
-            for (Integer subTaskId : subTasksId) {
-                SubTask subTask = allSubTasks.remove(subTaskId);
-                taskPriorityManager.remove(subTask);
-                historyManager.remove(subTaskId);
-            }
-
+            epicTask.getSubTasksId().stream()
+                    .peek(historyManager::remove)
+                    .map(allSubTasks::remove)
+                    .forEach(taskPriorityManager::remove);
             return true;
         } else {
             return false;
