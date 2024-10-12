@@ -54,7 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
             EpicTask epicTaskOfSubTask = allEpicTasks.get(subTask.getEpicId());
             epicTaskOfSubTask.addSubTaskId(subTask.getId());
             updateStatusEpic(epicTaskOfSubTask);
-            updateEndTimeEpic(epicTaskOfSubTask);
+            updateTimeEpic(epicTaskOfSubTask);
             return subTask.getId();
         } else {
             return -1;
@@ -159,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
             allSubTasks.put(subTask.getId(), subTask);
             updateStatusEpic(allEpicTasks.get(subTask.getEpicId()));
-            updateEndTimeEpic(allEpicTasks.get(subTask.getEpicId()));
+            updateTimeEpic(allEpicTasks.get(subTask.getEpicId()));
             return true;
         } else {
             return false;
@@ -199,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
             EpicTask epicTask = allEpicTasks.get(subTask.getEpicId());
             epicTask.removeSubTaskId(subTask.getId());
             updateStatusEpic(epicTask);
-            updateEndTimeEpic(epicTask);
+            updateTimeEpic(epicTask);
             return true;
         } else {
             return false;
@@ -237,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager {
         allEpicTasks.values().stream()
                 .peek(EpicTask::clearSubTasksId)
                 .peek(this::updateStatusEpic)
-                .forEach(this::updateEndTimeEpic);
+                .forEach(this::updateTimeEpic);
         allSubTasks.clear();
     }
 
@@ -261,7 +261,7 @@ public class InMemoryTaskManager implements TaskManager {
                     .forEach(taskPriorityManager::remove);
             epicTask.clearSubTasksId();
             updateStatusEpic(epicTask);
-            updateEndTimeEpic(epicTask);
+            updateTimeEpic(epicTask);
             return true;
         } else {
             return false;
@@ -325,12 +325,13 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void updateEndTimeEpic(EpicTask epicTask) {
+    private void updateTimeEpic(EpicTask epicTask) {
         List<SubTask> subTasks = epicTask.getSubTasksId().stream()
                 .map(allSubTasks::get)
                 .toList();
 
         if (subTasks.isEmpty()) {
+            epicTask.setStartTime(null);
             epicTask.setEndTime(null);
             return;
         }
@@ -345,18 +346,24 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (indexOfTaskNotNullStartTime == -1) {
+            epicTask.setStartTime(null);
             epicTask.setEndTime(null);
             return;
         }
 
+        SubTask firstSubTask = subTasks.get(indexOfTaskNotNullStartTime);
         SubTask lastSubTask = subTasks.get(indexOfTaskNotNullStartTime);
-
         for (int i = indexOfTaskNotNullStartTime; i < subTasks.size(); i++) {
             SubTask temp = subTasks.get(i);
-            if (temp.getStartTime() != null && temp.compareTo(lastSubTask) > 0) {
-                lastSubTask = temp;
+            if (temp.getStartTime() != null) {
+                if (temp.compareTo(lastSubTask) > 0) {
+                    lastSubTask = temp;
+                } else if (temp.compareTo(firstSubTask) < 0) {
+                    firstSubTask = temp;
+                }
             }
         }
+        epicTask.setStartTime(firstSubTask.getStartTime());
         epicTask.setEndTime(lastSubTask.getEndTime());
     }
 

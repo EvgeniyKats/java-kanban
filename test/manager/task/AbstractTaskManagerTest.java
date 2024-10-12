@@ -407,6 +407,59 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
     }
 
     @Test
+    void shouldBeUpdatedEpicTaskStartTime() {
+        EpicTask epicTask = new EpicTask("", "");
+        taskManager.addEpicTask(epicTask);
+        EpicTask epicTaskReceived = taskManager.getEpicTask(1);
+        assertNull(epicTaskReceived.getEndTime());
+
+        SubTask subTask1 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), 1);
+
+        SubTask subTask2 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1), 1);
+
+        SubTask subTask3 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                2), Duration.ofMinutes(1), 1);
+
+        SubTask subTask4 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                3), Duration.ofMinutes(1), 1);
+
+        int idSub4 = taskManager.addSubTask(subTask4);
+        assertEquals(subTask4.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+        int idSub3 = taskManager.addSubTask(subTask3);
+        assertEquals(subTask3.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+        int idSub2 = taskManager.addSubTask(subTask2);
+        assertEquals(subTask2.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+        int idSub1 = taskManager.addSubTask(subTask1);
+        assertEquals(subTask1.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub1);
+        assertEquals(subTask2.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub2);
+        assertEquals(subTask3.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub3);
+        assertEquals(subTask4.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub4);
+        assertNull(taskManager.getEpicTask(1).getStartTime());
+    }
+
+    @Test
     void shouldBeUpdatedEpicTaskEndTimeWithClear() {
         EpicTask epicTask = new EpicTask("", "");
         int idEpic = taskManager.addEpicTask(epicTask);
