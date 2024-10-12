@@ -8,7 +8,7 @@ import java.util.*;
 
 public class TaskPriorityManager {
     public static final int MINIMUM_DURATION_OF_TASK_IN_MINUTES = 1;
-    private final Map<LocalDateTime, Boolean> infoIsBusedThisTime;
+    private final Map<LocalDateTime, InfoAboutTime> infoIsBusedThisTime;
     private final TreeSet<Task> sortedTasks;
 
     private TaskPriorityManager() {
@@ -28,7 +28,7 @@ public class TaskPriorityManager {
                 return false;
             } else {
                 for (LocalDateTime localDateTime : timeIntervalOfTask) {
-                    infoIsBusedThisTime.put(localDateTime, true);
+                    setBusy(localDateTime, task);
                 }
                 sortedTasks.add(task);
                 return true;
@@ -39,12 +39,33 @@ public class TaskPriorityManager {
     }
 
     public boolean updateTask(Task task) {
-        if (sortedTasks.contains(task)) {
-            sortedTasks.remove(task);
-            sortedTasks.add(task);
-            return true;
-        } else {
+        Task old = null;
+
+        for (Task t : sortedTasks) {
+            if (t.equals(task)) {
+                old = t;
+                break;
+            }
+        }
+
+        if (old == null) {
             return false;
+        } else {
+            ArrayList<LocalDateTime> datesToAdd = new ArrayList<>();
+            if (isBadTaskTime(task, datesToAdd)) {
+                return false;
+            } else {
+                List<LocalDateTime> datesToDelete = getIntervalsOfTask(old);
+                for (LocalDateTime ldt : datesToDelete) {
+                    setNotBusy(ldt, task);
+                }
+                for (LocalDateTime ldt : datesToAdd) {
+                    setBusy(ldt, task);
+                }
+                sortedTasks.remove(task);
+                sortedTasks.add(task);
+                return true;
+            }
         }
     }
 
@@ -53,7 +74,7 @@ public class TaskPriorityManager {
             LocalDateTime start = task.getStartTime();
             LocalDateTime end = task.getEndTime();
             do {
-                infoIsBusedThisTime.put(start, false);
+                setNotBusy(start, task);
                 start = start.plusMinutes(MINIMUM_DURATION_OF_TASK_IN_MINUTES);
             } while (!start.equals(end));
             sortedTasks.remove(task);
@@ -72,8 +93,8 @@ public class TaskPriorityManager {
         LocalDateTime end = task.getEndTime();
         boolean isBadTaskTime = false;
         do {
-            Boolean busy = infoIsBusedThisTime.get(start);
-            if (busy != null && busy) {
+            InfoAboutTime info = infoIsBusedThisTime.get(start);
+            if (info != null && info.busy && !info.task.equals(task)) {
                 isBadTaskTime = true;
                 break;
             } else {
@@ -84,7 +105,36 @@ public class TaskPriorityManager {
         return isBadTaskTime;
     }
 
-    public Set<Task> getPrioritizedTasks() {
-        return new TreeSet<>(sortedTasks);
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(sortedTasks);
+    }
+
+    private List<LocalDateTime> getIntervalsOfTask(Task task) {
+        LocalDateTime start = task.getStartTime();
+        LocalDateTime end = task.getEndTime();
+        List<LocalDateTime> result = new ArrayList<>();
+        do {
+            result.add(start);
+            start = start.plusMinutes(MINIMUM_DURATION_OF_TASK_IN_MINUTES);
+        } while (!start.equals(end));
+        return result;
+    }
+
+    private void setNotBusy(LocalDateTime localDateTime, Task task) {
+        infoIsBusedThisTime.put(localDateTime, new InfoAboutTime(task, false));
+    }
+
+    private void setBusy(LocalDateTime localDateTime, Task task) {
+        infoIsBusedThisTime.put(localDateTime, new InfoAboutTime(task, true));
+    }
+
+    private static class InfoAboutTime {
+        final Task task;
+        final Boolean busy;
+
+        public InfoAboutTime(Task task, boolean busy) {
+            this.task = task;
+            this.busy = busy;
+        }
     }
 }

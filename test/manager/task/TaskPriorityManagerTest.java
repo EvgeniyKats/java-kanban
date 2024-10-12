@@ -31,6 +31,7 @@ class TaskPriorityManagerTest {
                 12,
                 10,
                 0), Duration.ofMinutes(10));
+        task.setId(1);
         taskPriorityManager.add(task);
         assertEquals(1, taskPriorityManager.getPrioritizedTasks().size());
     }
@@ -59,9 +60,12 @@ class TaskPriorityManagerTest {
         LocalDateTime localDateTime = LocalDateTime.of(2024, 10, 12, 10, 0);
 
         Task task = new SingleTask("", "", localDateTime, Duration.ofMinutes(3));
+        task.setId(1);
         List<Task> tasks = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            tasks.add(new SingleTask("", "", localDateTime.plusMinutes(i), Duration.ofMinutes(1)));
+            SingleTask singleTask = new SingleTask("", "", localDateTime.plusMinutes(i), Duration.ofMinutes(1));
+            tasks.add(singleTask);
+            singleTask.setId(2 + i);
         }
         taskPriorityManager.add(task);
 
@@ -77,9 +81,12 @@ class TaskPriorityManagerTest {
         LocalDateTime localDateTime = LocalDateTime.of(2024, 10, 12, 10, 0);
 
         Task task = new SingleTask("", "", localDateTime, Duration.ofMinutes(1));
+        task.setId(1);
         List<Task> tasks = new ArrayList<>();
         tasks.add(new SingleTask("", "", localDateTime.plusMinutes(1), Duration.ofMinutes(1)));
         tasks.add(new SingleTask("", "", localDateTime.minusMinutes(1), Duration.ofMinutes(1)));
+        tasks.get(0).setId(2);
+        tasks.get(1).setId(3);
         taskPriorityManager.add(task);
 
         for (Task t : tasks) {
@@ -90,7 +97,7 @@ class TaskPriorityManagerTest {
     }
 
     @Test
-    void shouldBeSuccessRemovedTaskAndNotSuccessAfterAll() {
+    void shouldBeSuccessRemovedTask() {
         Task task = new SingleTask("", "", LocalDateTime.of(2024,
                 10,
                 12,
@@ -99,10 +106,20 @@ class TaskPriorityManagerTest {
         task.setId(1);
         taskPriorityManager.add(task);
         assertEquals(1, taskPriorityManager.getPrioritizedTasks().size());
-        assertTrue(taskPriorityManager.isBadTaskTime(task, new ArrayList<>()));
+        assertFalse(taskPriorityManager.isBadTaskTime(task, new ArrayList<>()));
         assertTrue(taskPriorityManager.remove(task));
         assertEquals(0, taskPriorityManager.getPrioritizedTasks().size());
         assertFalse(taskPriorityManager.isBadTaskTime(task, new ArrayList<>()));
+    }
+
+    @Test
+    void shouldBeNotSuccessRemovedTaskIfHaveNot() {
+        Task task = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(10));
+        task.setId(1);
         assertFalse(taskPriorityManager.remove(task));
     }
 
@@ -119,7 +136,7 @@ class TaskPriorityManagerTest {
 
         for (Task t : tasks) {
             assertTrue(taskPriorityManager.add(t));
-            assertTrue(taskPriorityManager.isBadTaskTime(t, new ArrayList<>()));
+            assertFalse(taskPriorityManager.isBadTaskTime(t, new ArrayList<>()));
         }
         assertEquals(3, taskPriorityManager.getPrioritizedTasks().size());
         taskPriorityManager.clearAll();
@@ -145,6 +162,13 @@ class TaskPriorityManagerTest {
         Task task5 = new SingleTask("", "", localDateTime5, Duration.ofMinutes(1));
         Task task6 = new SingleTask("", "", localDateTime6, Duration.ofMinutes(1));
 
+        task1.setId(1);
+        task2.setId(2);
+        task3.setId(3);
+        task4.setId(4);
+        task5.setId(5);
+        task6.setId(6);
+
         taskPriorityManager.add(task1);
         taskPriorityManager.add(task2);
         taskPriorityManager.add(task3);
@@ -152,7 +176,7 @@ class TaskPriorityManagerTest {
         taskPriorityManager.add(task5);
         taskPriorityManager.add(task6);
 
-        List<Task> tasks = new ArrayList<>(taskPriorityManager.getPrioritizedTasks());
+        List<Task> tasks = taskPriorityManager.getPrioritizedTasks();
 
         for (int i = 0; i < tasks.size(); i++) {
             for (int j = 0; j < tasks.size(); j++) {
@@ -182,7 +206,7 @@ class TaskPriorityManagerTest {
         Task taskCopy = task.getCopy();
         taskCopy.setName("after");
         assertTrue(taskPriorityManager.updateTask(taskCopy));
-        List<Task> tasks = new ArrayList<>(taskPriorityManager.getPrioritizedTasks());
+        List<Task> tasks = taskPriorityManager.getPrioritizedTasks();
         assertEquals("after", tasks.getFirst().getName());
     }
 }
