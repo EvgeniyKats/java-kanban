@@ -27,9 +27,7 @@ public class TaskPriorityManager {
             if (isBadTaskTime(task, timeIntervalOfTask)) {
                 return false;
             } else {
-                for (LocalDateTime localDateTime : timeIntervalOfTask) {
-                    setBusy(localDateTime, task);
-                }
+                timeIntervalOfTask.forEach(localDateTime -> setBusy(localDateTime, task));
                 sortedTasks.add(task);
                 return true;
             }
@@ -56,12 +54,8 @@ public class TaskPriorityManager {
                 return false;
             } else {
                 List<LocalDateTime> datesToDelete = getIntervalsOfTask(old);
-                for (LocalDateTime ldt : datesToDelete) {
-                    setNotBusy(ldt, task);
-                }
-                for (LocalDateTime ldt : datesToAdd) {
-                    setBusy(ldt, task);
-                }
+                datesToDelete.forEach(localDateTime -> setNotBusy(localDateTime, task));
+                datesToAdd.forEach(localDateTime -> setBusy(localDateTime, task));
                 sortedTasks.remove(task);
                 sortedTasks.add(task);
                 return true;
