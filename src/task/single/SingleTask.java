@@ -31,6 +31,7 @@ public class SingleTask implements Task {
         this.name = name;
         this.startTime = startTime;
         this.duration = duration;
+        this.status = Status.NEW;
     }
 
     protected SingleTask(String name, String description, TaskType taskType) {
@@ -178,7 +179,20 @@ public class SingleTask implements Task {
 
         if (task.getTaskType().equals(TaskType.SUB_TASK)) {
             SubTask subTask = (SubTask) task;
-            builder.append(subTask.getEpicId());
+            builder.append(subTask.getEpicId()).append(",");
+        } else {
+            builder.append(",");
+        }
+
+        builder.append(task.getStartTime()).append(",");
+        if (task.getDuration() != null) {
+            builder.append(task.getDuration().toMinutes()).append(",");
+        } else {
+            builder.append(task.getDuration()).append(",");
+        }
+
+        if(task.getTaskType().equals(TaskType.EPIC_TASK)) {
+            builder.append(task.getEndTime());
         }
 
         return builder.toString();

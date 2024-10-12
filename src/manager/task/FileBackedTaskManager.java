@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -150,6 +152,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 epicTask.addSubTaskId(subTask.getId());
                             }
                         }
+
                     }
                     case SUB_TASK -> {
                         SubTask subTask = (SubTask) task;
@@ -176,6 +179,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         final int statusLocation = 3;
         final int descriptionLocation = 4;
         final int epicIdLocation = 5;
+        final int startTimeLocation = 6;
+        final int durationLocation = 7;
+        final int endTimeLocation = 8;
 
         String[] taskFields = value.split(",", -1);
         Task task;
@@ -184,7 +190,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (typeS.equals(TaskType.SINGLE_TASK.toString())) {
             task = new SingleTask(taskFields[nameLocation], taskFields[descriptionLocation]);
         } else if (typeS.equals(TaskType.EPIC_TASK.toString())) {
-            task = new EpicTask(taskFields[nameLocation], taskFields[descriptionLocation]);
+            EpicTask epicTask = new EpicTask(taskFields[nameLocation], taskFields[descriptionLocation]);
+            if (!taskFields[endTimeLocation].equals("null")) {
+                epicTask.setEndTime(LocalDateTime.parse(taskFields[endTimeLocation]));
+            }
+            task = epicTask;
         } else {
             task = new SubTask(taskFields[nameLocation], taskFields[descriptionLocation],
                     Integer.parseInt(taskFields[epicIdLocation]));
@@ -192,6 +202,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         task.setId(Integer.parseInt(taskFields[idLocation]));
         task.setName(taskFields[nameLocation]);
         task.setDescription(taskFields[descriptionLocation]);
+        if (!taskFields[startTimeLocation].equals("null")) {
+            task.setStartTime(LocalDateTime.parse(taskFields[startTimeLocation]));
+        }
+        if (!taskFields[durationLocation].equals("null")) {
+            task.setDuration(Duration.ofMinutes(Long.parseLong(taskFields[durationLocation])));
+        }
 
         Status status;
         String statusS = taskFields[statusLocation];
@@ -213,7 +229,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             if (!Files.exists(path)) {
                 Files.createFile(path);
             }
-            String title = "id,type,name,status,description,epic";
+            String title = "id,type,name,status,description,epic,startTime,duration,endTime";
             bufferedWriter.write(title + "\n");
 
             for (SingleTask singleTask : getAllSingleTasks()) {

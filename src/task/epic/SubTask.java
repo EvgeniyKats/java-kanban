@@ -16,7 +16,7 @@ public class SubTask extends SingleTask {
     }
 
     public SubTask(String name, String description, LocalDateTime startTime, Duration duration, Integer epicId) {
-        super(description, name, startTime, duration);
+        super(name, description, TaskType.SUB_TASK, startTime, duration);
         this.epicId = epicId;
     }
 
