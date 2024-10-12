@@ -209,4 +209,44 @@ class TaskPriorityManagerTest {
         List<Task> tasks = taskPriorityManager.getPrioritizedTasks();
         assertEquals("after", tasks.getFirst().getName());
     }
+
+    @Test
+    void shouldBeNotUpdateIfHaveNotTask() {
+        Task task = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(10));
+        task.setId(1);
+        taskPriorityManager.add(task);
+        Task task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(10));
+        task2.setId(2);
+        assertFalse(taskPriorityManager.updateTask(task2));
+    }
+
+    @Test
+    void shouldBeNotUpdateIfBadTimeTask() {
+        Task task1 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+        task1.setId(1);
+        taskPriorityManager.add(task1);
+        Task task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1));
+        task2.setId(2);
+        taskPriorityManager.add(task2);
+
+        Task task3 = task2.getCopy();
+        task3.setStartTime(task1.getStartTime());
+        assertFalse(taskPriorityManager.updateTask(task3));
+    }
 }

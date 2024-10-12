@@ -433,7 +433,7 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldBeNotSuccessUpdateIfBadTime() {
+    void shouldBeNotSuccessAddIfBadTime() {
         SingleTask singleTask = new SingleTask("", "", LocalDateTime.of(2024,
                 10,
                 12,
@@ -452,6 +452,49 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
                 10,
                 0), Duration.ofMinutes(1), idEpic);
         assertEquals(-2, taskManager.addSubTask(subTask));
+    }
+
+    @Test
+    void shouldBeNotUpdateSingleIfBadTimeTask() {
+        SingleTask task1 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+        taskManager.addSingleTask(task1);
+        SingleTask task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1));
+        taskManager.addSingleTask(task2);
+
+        SingleTask task3 = task2.getCopy();
+        task3.setStartTime(task1.getStartTime());
+        assertFalse(taskManager.updateSingleTask(task3));
+    }
+
+    @Test
+    void shouldBeNotUpdateSubIfBadTimeTask() {
+        EpicTask epicTask = new EpicTask("", "");
+        int idEpic = taskManager.addEpicTask(epicTask);
+
+        SubTask task1 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), idEpic);
+        taskManager.addSubTask(task1);
+        SubTask task2 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1), idEpic);
+        taskManager.addSubTask(task2);
+
+        SubTask task3 = task2.getCopy();
+        task3.setStartTime(task1.getStartTime());
+        assertFalse(taskManager.updateSubTask(task3));
     }
 
     private void putInManager_2SingleTasks_2EpicTasksWith_2Subtasks() {
