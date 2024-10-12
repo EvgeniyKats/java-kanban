@@ -38,6 +38,16 @@ public class TaskPriorityManager {
         }
     }
 
+    public boolean updateTask(Task task) {
+        if (sortedTasks.contains(task)) {
+            sortedTasks.remove(task);
+            sortedTasks.add(task);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean remove(Task task) {
         if (sortedTasks.contains(task)) {
             LocalDateTime start = task.getStartTime();

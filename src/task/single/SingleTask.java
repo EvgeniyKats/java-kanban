@@ -25,7 +25,7 @@ public class SingleTask implements Task {
         this.status = Status.NEW;
     }
 
-    public SingleTask(String description, String name, LocalDateTime startTime, Duration duration) {
+    public SingleTask(String name, String description, LocalDateTime startTime, Duration duration) {
         taskType = TaskType.SINGLE_TASK;
         this.description = description;
         this.name = name;

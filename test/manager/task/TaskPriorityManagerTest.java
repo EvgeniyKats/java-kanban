@@ -7,8 +7,7 @@ import task.single.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -168,5 +167,22 @@ class TaskPriorityManagerTest {
                 }
             }
         }
+    }
+
+    @Test
+    void shouldBeUpdatedTaskVersion() {
+        Task task = new SingleTask("before", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(10));
+        task.setId(1);
+        assertFalse(taskPriorityManager.updateTask(task));
+        taskPriorityManager.add(task);
+        Task taskCopy = task.getCopy();
+        taskCopy.setName("after");
+        assertTrue(taskPriorityManager.updateTask(taskCopy));
+        List<Task> tasks = new ArrayList<>(taskPriorityManager.getPrioritizedTasks());
+        assertEquals("after", tasks.getFirst().getName());
     }
 }
