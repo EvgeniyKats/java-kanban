@@ -157,6 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean updateSingleTask(SingleTask singleTask) {
         if ((singleTask.getClass() == SingleTask.class) && allSingleTasks.containsKey(singleTask.getId())) {
             allSingleTasks.put(singleTask.getId(), singleTask);
+            taskPriorityManager.updateTask(singleTask);
             return true;
         } else {
             return false;
@@ -167,6 +168,7 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean updateSubTask(SubTask subTask) {
         if ((subTask.getClass() == SubTask.class) && allSubTasks.containsKey(subTask.getId())) {
             allSubTasks.put(subTask.getId(), subTask);
+            taskPriorityManager.updateTask(subTask);
             updateStatusEpic(allEpicTasks.get(subTask.getEpicId()));
             return true;
         } else {
