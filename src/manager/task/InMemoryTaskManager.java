@@ -223,36 +223,30 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearAllSingleTasks() {
-        for (SingleTask singleTask : allSingleTasks.values()) {
-            taskPriorityManager.remove(singleTask);
-            historyManager.remove(singleTask.getId());
-        }
+        allSingleTasks.values().stream()
+                .peek(taskPriorityManager::remove)
+                .forEach(singleTask -> historyManager.remove(singleTask.getId()));
         allSingleTasks.clear();
     }
 
     @Override
     public void clearAllSubTasks() {
-        for (SubTask subTask : allSubTasks.values()) {
-            taskPriorityManager.remove(subTask);
-            historyManager.remove(subTask.getId());
-        }
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            epicTask.clearSubTasksId();
-            updateStatusEpic(epicTask);
-            updateEndTimeEpic(epicTask);
-        }
+        allSubTasks.values().stream()
+                .peek(taskPriorityManager::remove)
+                .forEach(subTask -> historyManager.remove(subTask.getId()));
+        allEpicTasks.values().stream()
+                .peek(EpicTask::clearSubTasksId)
+                .peek(this::updateStatusEpic)
+                .forEach(this::updateEndTimeEpic);
         allSubTasks.clear();
     }
 
     @Override
     public void clearAllEpicTasks() {
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            historyManager.remove(epicTask.getId());
-        }
-        for (SubTask subTask : allSubTasks.values()) {
-            taskPriorityManager.remove(subTask);
-            historyManager.remove(subTask.getId());
-        }
+        allEpicTasks.values().forEach(epicTask -> historyManager.remove(epicTask.getId()));
+        allSubTasks.values().stream()
+                .peek(taskPriorityManager::remove)
+                .forEach(subTask -> historyManager.remove(subTask.getId()));
         allSubTasks.clear();
         allEpicTasks.clear();
     }
@@ -261,14 +255,10 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean clearEpicSubTasks(int id) {
         if (allEpicTasks.containsKey(id)) {
             EpicTask epicTask = allEpicTasks.get(id);
-            List<Integer> subTasksId = epicTask.getSubTasksId();
-
-            for (Integer subTaskId : subTasksId) {
-                SubTask subTask = allSubTasks.remove(subTaskId);
-                taskPriorityManager.remove(subTask);
-                historyManager.remove(subTaskId);
-            }
-
+            epicTask.getSubTasksId().stream()
+                    .peek(historyManager::remove)
+                    .map(allSubTasks::remove)
+                    .forEach(taskPriorityManager::remove);
             epicTask.clearSubTasksId();
             updateStatusEpic(epicTask);
             updateEndTimeEpic(epicTask);
@@ -336,10 +326,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void updateEndTimeEpic(EpicTask epicTask) {
-        List<SubTask> subTasks = new ArrayList<>();
-        for (Integer id : epicTask.getSubTasksId()) {
-            subTasks.add(allSubTasks.get(id));
-        }
+        List<SubTask> subTasks = epicTask.getSubTasksId().stream()
+                .map(allSubTasks::get)
+                .toList();
 
         if (subTasks.isEmpty()) {
             epicTask.setEndTime(null);
