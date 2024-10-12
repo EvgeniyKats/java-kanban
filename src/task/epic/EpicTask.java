@@ -20,6 +20,7 @@ public class EpicTask extends SingleTask {
     protected EpicTask(EpicTask epicTask) {
         super(epicTask);
         this.subTasksId = epicTask.subTasksId;
+        this.endTime = epicTask.endTime;
     }
 
     public List<Integer> getSubTasksId() {
