@@ -52,7 +52,7 @@ public class TaskPriorityManager {
         return false;
     }
 
-    public void removeAll() {
+    public void clearAll() {
         infoIsBusedThisTime.clear();
         sortedTasks.clear();
     }

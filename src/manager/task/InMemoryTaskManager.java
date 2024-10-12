@@ -13,6 +13,7 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
     public static int DEFAULT_ID_NEXT = 1;
     private final HistoryManager historyManager = Managers.getDefaultHistory();
+    private final TaskPriorityManager taskPriorityManager = Managers.getTaskPriorityManager();
     protected final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     protected final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     protected final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
@@ -21,6 +22,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addSingleTask(SingleTask singleTask) {
         if ((singleTask.getClass() == SingleTask.class) && !allSingleTasks.containsValue(singleTask)) {
+            if (singleTask.getStartTime() != null) {
+                if (!taskPriorityManager.add(singleTask)) {
+                    return -2;
+                }
+            }
             if (singleTask.getId() == null) {
                 setTaskId(singleTask);
             }
@@ -35,6 +41,11 @@ public class InMemoryTaskManager implements TaskManager {
     public int addSubTask(SubTask subTask) {
         if ((subTask.getClass() == SubTask.class) && !allSubTasks.containsValue(subTask)
                 && allEpicTasks.containsKey(subTask.getEpicId())) {
+            if (subTask.getStartTime() != null) {
+                if (!taskPriorityManager.add(subTask)) {
+                    return -2;
+                }
+            }
             if (subTask.getId() == null) {
                 setTaskId(subTask);
             }
@@ -178,6 +189,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean removeSingleTask(int id) {
         if (allSingleTasks.containsKey(id)) {
+            taskPriorityManager.remove(allSingleTasks.get(id));
             allSingleTasks.remove(id);
             historyManager.remove(id);
             return true;
@@ -190,6 +202,7 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean removeSubTask(int id) {
         if (allSubTasks.containsKey(id)) {
             SubTask subTask = allSubTasks.remove(id);
+            taskPriorityManager.remove(subTask);
             historyManager.remove(id);
             EpicTask epicTask = allEpicTasks.get(subTask.getEpicId());
             epicTask.removeSubTaskId(subTask.getId());
@@ -208,7 +221,8 @@ public class InMemoryTaskManager implements TaskManager {
             List<Integer> subTasksId = epicTask.getSubTasksId();
 
             for (Integer subTaskId : subTasksId) {
-                allSubTasks.remove(subTaskId);
+                SubTask subTask = allSubTasks.remove(subTaskId);
+                taskPriorityManager.remove(subTask);
                 historyManager.remove(subTaskId);
             }
 
@@ -221,6 +235,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearAllSingleTasks() {
         for (SingleTask singleTask : allSingleTasks.values()) {
+            taskPriorityManager.remove(singleTask);
             historyManager.remove(singleTask.getId());
         }
         allSingleTasks.clear();
@@ -229,6 +244,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearAllSubTasks() {
         for (SubTask subTask : allSubTasks.values()) {
+            taskPriorityManager.remove(subTask);
             historyManager.remove(subTask.getId());
         }
         for (EpicTask epicTask : allEpicTasks.values()) {
@@ -244,6 +260,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(epicTask.getId());
         }
         for (SubTask subTask : allSubTasks.values()) {
+            taskPriorityManager.remove(subTask);
             historyManager.remove(subTask.getId());
         }
         allSubTasks.clear();
@@ -257,7 +274,8 @@ public class InMemoryTaskManager implements TaskManager {
             List<Integer> subTasksId = epicTask.getSubTasksId();
 
             for (Integer subTaskId : subTasksId) {
-                allSubTasks.remove(subTaskId);
+                SubTask subTask = allSubTasks.remove(subTaskId);
+                taskPriorityManager.remove(subTask);
                 historyManager.remove(subTaskId);
             }
 
@@ -271,6 +289,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEveryTasks() {
+        taskPriorityManager.clearAll();
         historyManager.clearHistory();
         allSingleTasks.clear();
         allSubTasks.clear();

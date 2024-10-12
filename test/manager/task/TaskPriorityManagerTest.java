@@ -123,7 +123,7 @@ class TaskPriorityManagerTest {
             assertTrue(taskPriorityManager.isBadTaskTime(t, new ArrayList<>()));
         }
         assertEquals(3, taskPriorityManager.getPrioritizedTasks().size());
-        taskPriorityManager.removeAll();
+        taskPriorityManager.clearAll();
         assertEquals(0, taskPriorityManager.getPrioritizedTasks().size());
         for (Task t : tasks) {
             assertFalse(taskPriorityManager.isBadTaskTime(t, new ArrayList<>()));
