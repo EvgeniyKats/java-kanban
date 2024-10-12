@@ -191,7 +191,7 @@ public class SingleTask implements Task {
             builder.append(task.getDuration()).append(",");
         }
 
-        if(task.getTaskType().equals(TaskType.EPIC_TASK)) {
+        if (task.getTaskType().equals(TaskType.EPIC_TASK)) {
             builder.append(task.getEndTime());
         }
 
