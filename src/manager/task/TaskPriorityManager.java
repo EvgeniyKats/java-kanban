@@ -9,7 +9,7 @@ import java.util.*;
 public class TaskPriorityManager {
     public static final int MINIMUM_DURATION_OF_TASK_IN_MINUTES = 1;
     private final Map<LocalDateTime, InfoAboutTime> infoIsBusedThisTime;
-    private final TreeSet<Task> sortedTasks;
+    private final Set<Task> sortedTasks;
 
     private TaskPriorityManager() {
         infoIsBusedThisTime = new HashMap<>();
