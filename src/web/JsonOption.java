@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import task.TaskType;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public class JsonOption {
     private final static Gson gson = new GsonBuilder()
@@ -28,16 +30,44 @@ public class JsonOption {
         return gson.toJson(task);
     }
 
-    public static SingleTask getSingleTaskFromJson(String json) {
-        return gson.fromJson(json, SingleTask.class);
+    public static Optional<SingleTask> getSingleTaskFromJson(String json) {
+        if (isStringNullOrEmpty(json)) {
+            return Optional.empty();
+        }
+        SingleTask singleTask = gson.fromJson(json, SingleTask.class);
+        if (singleTask.getTaskType().equals(TaskType.SINGLE_TASK)) {
+            return Optional.of(singleTask);
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public static SubTask getSubTaskFromJson(String json) {
-        return gson.fromJson(json, SubTask.class);
+    public static Optional<SubTask> getSubTaskFromJson(String json) {
+        if (isStringNullOrEmpty(json)) {
+            return Optional.empty();
+        }
+        SubTask subTask = gson.fromJson(json, SubTask.class);
+        if (subTask.getTaskType().equals(TaskType.SUB_TASK)) {
+            return Optional.of(subTask);
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public static EpicTask getEpicTaskFromJson(String json) {
-        return gson.fromJson(json, EpicTask.class);
+    public static Optional<EpicTask> getEpicTaskFromJson(String json) {
+        if (isStringNullOrEmpty(json)) {
+            return Optional.empty();
+        }
+        EpicTask epicTask = gson.fromJson(json, EpicTask.class);
+        if (epicTask.getTaskType().equals(TaskType.EPIC_TASK)) {
+            return Optional.of(epicTask);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static boolean isStringNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 
     static class LocalDateAdapter extends TypeAdapter<LocalDateTime> {
