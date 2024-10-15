@@ -7,21 +7,25 @@ import web.handle.SingleTaskHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class HttpTaskServer {
+    private static boolean useFileBackendTaskManager = false;
+    private static boolean needToRestoreTasks = false;
+    private static Path path = null;
     private final static int PORT = 8080;
-    private final HttpServer httpServer;
+    private HttpServer httpServer;
     private final TaskManager manager;
     private boolean isAlive;
 
-    private HttpTaskServer() {
-        try {
-            isAlive = false;
+    protected HttpTaskServer() {
+        isAlive = false;
+        if (useFileBackendTaskManager) {
             manager = Managers.getDefault();
-            httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-            httpServer.createContext("/tasks", new SingleTaskHandler());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else {
+            manager = Managers.getFileBackendTaskManager(path, needToRestoreTasks);
         }
     }
 
@@ -33,21 +37,27 @@ public class HttpTaskServer {
         private static final HttpTaskServer INSTANCE = new HttpTaskServer();
     }
 
-    public void start() {
+    public boolean start() throws IOException {
         synchronized (getInstance()) {
             if (isAlive) {
                 System.out.println("Сервер уже запущен: " + httpServer.getAddress());
+                return false;
             } else {
+                httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
+                httpServer.createContext("/tasks", new SingleTaskHandler());
                 httpServer.start();
                 isAlive = true;
+                return true;
             }
         }
     }
 
     public void stop() {
         synchronized (getInstance()) {
-            httpServer.stop(0);
-            isAlive = false;
+            if (httpServer != null) {
+                httpServer.stop(0);
+                isAlive = false;
+            }
         }
     }
 
@@ -56,6 +66,15 @@ public class HttpTaskServer {
     }
 
     public static void main(String[] args) {
-        getInstance().start();
+        try {
+            if (args[0].equals("1")) {
+                useFileBackendTaskManager = true;
+                path = Paths.get(args[1]);
+                needToRestoreTasks = Boolean.parseBoolean(args[2]);
+            }
+            getInstance().start();
+        } catch (Throwable throwable) {
+            System.out.println("Неизвестная ошибка: " + Arrays.toString(throwable.getStackTrace()));
+        }
     }
 }
