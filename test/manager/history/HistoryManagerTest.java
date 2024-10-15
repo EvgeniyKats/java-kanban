@@ -71,6 +71,51 @@ class HistoryManagerTest {
     }
 
     @Test
+    void shouldBeSuccessRemoveFirstTaskOfThree() {
+        SingleTask singleTask1 = new SingleTask("", "");
+        singleTask1.setId(1);
+        historyManager.add(singleTask1);
+        SingleTask singleTask2 = singleTask1.getCopy();
+        SingleTask singleTask3 = singleTask1.getCopy();
+        singleTask2.setId(2);
+        singleTask3.setId(3);
+        historyManager.add(singleTask2);
+        historyManager.add(singleTask3);
+        historyManager.remove(1);
+        assertFalse(historyManager.getHistory().contains(singleTask1));
+    }
+
+    @Test
+    void shouldBeSuccessRemoveSecondTaskOfThree() {
+        SingleTask singleTask1 = new SingleTask("", "");
+        singleTask1.setId(1);
+        historyManager.add(singleTask1);
+        SingleTask singleTask2 = singleTask1.getCopy();
+        SingleTask singleTask3 = singleTask1.getCopy();
+        singleTask2.setId(2);
+        singleTask3.setId(3);
+        historyManager.add(singleTask2);
+        historyManager.add(singleTask3);
+        historyManager.remove(3);
+        assertFalse(historyManager.getHistory().contains(singleTask3));
+    }
+
+    @Test
+    void shouldBeSuccessRemoveThirdTaskOfThree() {
+        SingleTask singleTask1 = new SingleTask("", "");
+        singleTask1.setId(1);
+        historyManager.add(singleTask1);
+        SingleTask singleTask2 = singleTask1.getCopy();
+        SingleTask singleTask3 = singleTask1.getCopy();
+        singleTask2.setId(2);
+        singleTask3.setId(3);
+        historyManager.add(singleTask2);
+        historyManager.add(singleTask3);
+        historyManager.remove(3);
+        assertFalse(historyManager.getHistory().contains(singleTask3));
+    }
+
+    @Test
     void checkSpamOneTaskStability() {
         taskManager.addSingleTask(new SingleTask("name", "desc"));
 

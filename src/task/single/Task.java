@@ -3,7 +3,10 @@ package task.single;
 import task.Status;
 import task.TaskType;
 
-public interface Task {
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+public interface Task extends Comparable<Task> {
     String getName();
 
     String getDescription();
@@ -23,4 +26,14 @@ public interface Task {
     SingleTask getCopy();
 
     TaskType getTaskType();
+
+    LocalDateTime getStartTime();
+
+    void setStartTime(LocalDateTime startTime);
+
+    Duration getDuration();
+
+    void setDuration(Duration duration);
+
+    LocalDateTime getEndTime();
 }

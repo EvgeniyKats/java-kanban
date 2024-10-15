@@ -7,6 +7,9 @@ import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SingleAndSubAndEpicTest {
@@ -45,5 +48,33 @@ public class SingleAndSubAndEpicTest {
         assertEquals(singleTask.getName(), singleTaskReceived.getName());
         assertEquals(singleTask.getDescription(), singleTaskReceived.getDescription());
         assertEquals(singleTask.getStatus(), singleTaskReceived.getStatus());
+    }
+
+    @Test
+    void compareShouldBe1IfTaskStartTimeAfter() {
+        SingleTask task1 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1));
+        SingleTask task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                2), Duration.ofMinutes(1));
+        assertTrue(task2.getStartTime().isAfter(task1.getStartTime()));
+        assertEquals(1, task2.compareTo(task1));
+    }
+
+    @Test
+    void compareShouldBeLessIfTaskStartTimeNull() {
+        SingleTask task1 = new SingleTask("1", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                5), Duration.ofMinutes(1));
+        SingleTask task2 = new SingleTask("2", "");
+        assertEquals(-1, task1.compareTo(task2));
+        assertEquals(1, task2.compareTo(task1));
     }
 }

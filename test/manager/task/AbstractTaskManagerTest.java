@@ -7,6 +7,8 @@ import task.epic.SubTask;
 import task.single.SingleTask;
 import task.single.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -327,6 +329,257 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         assertEquals("newName", taskManager.getSingleTask(id).getName()); // обновит задачу в истории
     }
 
+    @Test
+    void shouldBeNotAddedSingeTaskIfSetBadTime() {
+        SingleTask task = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+        SingleTask copy = task.getCopy();
+        assertEquals(1, taskManager.addSingleTask(task));
+        assertEquals(-2, taskManager.addSingleTask(copy));
+    }
+
+    @Test
+    void shouldBeNotAddedSubTaskIfSetBadTime() {
+        EpicTask epicTask = new EpicTask("", "");
+        taskManager.addEpicTask(epicTask);
+        SubTask task = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), 1);
+        SubTask copy = task.getCopy();
+        assertEquals(2, taskManager.addSubTask(task));
+        assertEquals(-2, taskManager.addSubTask(copy));
+    }
+
+    @Test
+    void shouldBeUpdatedEpicTaskEndTime() {
+        EpicTask epicTask = new EpicTask("", "");
+        taskManager.addEpicTask(epicTask);
+        EpicTask epicTaskReceived = taskManager.getEpicTask(1);
+        assertNull(epicTaskReceived.getEndTime());
+
+        SubTask subTask1 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), 1);
+
+        SubTask subTask2 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1), 1);
+
+        SubTask subTask3 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                2), Duration.ofMinutes(1), 1);
+
+        SubTask subTask4 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                3), Duration.ofMinutes(1), 1);
+
+        int idSub1 = taskManager.addSubTask(subTask1);
+        assertEquals(subTask1.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+        int idSub2 = taskManager.addSubTask(subTask2);
+        assertEquals(subTask2.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+        int idSub3 = taskManager.addSubTask(subTask3);
+        assertEquals(subTask3.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+        int idSub4 = taskManager.addSubTask(subTask4);
+        assertEquals(subTask4.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+
+        taskManager.removeSubTask(idSub4);
+        assertEquals(subTask3.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+        taskManager.removeSubTask(idSub3);
+        assertEquals(subTask2.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+        taskManager.removeSubTask(idSub2);
+        assertEquals(subTask1.getEndTime(), taskManager.getEpicTask(1).getEndTime());
+
+        taskManager.removeSubTask(idSub1);
+        assertNull(taskManager.getEpicTask(1).getEndTime());
+    }
+
+    @Test
+    void shouldBeUpdatedEpicTaskStartTime() {
+        EpicTask epicTask = new EpicTask("", "");
+        taskManager.addEpicTask(epicTask);
+        EpicTask epicTaskReceived = taskManager.getEpicTask(1);
+        assertNull(epicTaskReceived.getEndTime());
+
+        SubTask subTask1 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), 1);
+
+        SubTask subTask2 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1), 1);
+
+        SubTask subTask3 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                2), Duration.ofMinutes(1), 1);
+
+        SubTask subTask4 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                3), Duration.ofMinutes(1), 1);
+
+        int idSub4 = taskManager.addSubTask(subTask4);
+        assertEquals(subTask4.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+        int idSub3 = taskManager.addSubTask(subTask3);
+        assertEquals(subTask3.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+        int idSub2 = taskManager.addSubTask(subTask2);
+        assertEquals(subTask2.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+        int idSub1 = taskManager.addSubTask(subTask1);
+        assertEquals(subTask1.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub1);
+        assertEquals(subTask2.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub2);
+        assertEquals(subTask3.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub3);
+        assertEquals(subTask4.getStartTime(), taskManager.getEpicTask(1).getStartTime());
+
+        taskManager.removeSubTask(idSub4);
+        assertNull(taskManager.getEpicTask(1).getStartTime());
+    }
+
+    @Test
+    void shouldBeUpdatedEpicTaskEndTimeWithClear() {
+        EpicTask epicTask = new EpicTask("", "");
+        int idEpic = taskManager.addEpicTask(epicTask);
+        assertNull(taskManager.getEpicTask(idEpic).getEndTime());
+
+        SubTask subTask1 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), 1);
+
+
+        int idSub1 = taskManager.addSubTask(subTask1);
+        assertEquals(subTask1.getEndTime(), taskManager.getEpicTask(idEpic).getEndTime());
+
+        taskManager.removeSubTask(idSub1);
+        assertNull(taskManager.getEpicTask(idEpic).getEndTime());
+
+        taskManager.addSubTask(subTask1);
+        assertEquals(subTask1.getEndTime(), taskManager.getEpicTask(idEpic).getEndTime());
+
+        taskManager.clearAllSubTasks();
+        assertNull(taskManager.getEpicTask(idEpic).getEndTime());
+    }
+
+    @Test
+    void shouldBeNotSuccessAddIfBadTime() {
+        SingleTask singleTask = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+        SingleTask singleTask2 = singleTask.getCopy();
+        taskManager.addSingleTask(singleTask);
+        assertEquals(-2, taskManager.addSingleTask(singleTask2));
+
+        EpicTask epicTask = new EpicTask("", "");
+        int idEpic = taskManager.addEpicTask(epicTask);
+
+        SubTask subTask = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), idEpic);
+        assertEquals(-2, taskManager.addSubTask(subTask));
+    }
+
+    @Test
+    void shouldBeNotUpdateSingleIfBadTimeTask() {
+        SingleTask task1 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+        taskManager.addSingleTask(task1);
+        SingleTask task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1));
+        taskManager.addSingleTask(task2);
+
+        SingleTask task3 = task2.getCopy();
+        task3.setStartTime(task1.getStartTime());
+        assertFalse(taskManager.updateSingleTask(task3));
+    }
+
+    @Test
+    void shouldBeNotUpdateSubIfBadTimeTask() {
+        EpicTask epicTask = new EpicTask("", "");
+        int idEpic = taskManager.addEpicTask(epicTask);
+
+        SubTask task1 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1), idEpic);
+        taskManager.addSubTask(task1);
+        SubTask task2 = new SubTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                1), Duration.ofMinutes(1), idEpic);
+        taskManager.addSubTask(task2);
+
+        SubTask task3 = task2.getCopy();
+        task3.setStartTime(task1.getStartTime());
+        assertFalse(taskManager.updateSubTask(task3));
+    }
+
+    @Test
+    void shouldBeSuccessAdded1TaskWithSetTime() {
+        SingleTask task1 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                5), Duration.ofMinutes(1));
+        SingleTask task2 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                0), Duration.ofMinutes(1));
+
+        SingleTask task3 = new SingleTask("", "", LocalDateTime.of(2024,
+                10,
+                12,
+                10,
+                10), Duration.ofMinutes(1));
+
+        int id1 = taskManager.addSingleTask(task1);
+        int id2 = taskManager.addSingleTask(task2);
+        int id3 = taskManager.addSingleTask(task3);
+
+        List<Task> tasks = taskManager.getPrioritizedTasks();
+        assertEquals(3, tasks.size());
+        assertEquals(taskManager.getSingleTask(id1), tasks.get(1));
+        assertEquals(taskManager.getSingleTask(id2), tasks.get(0));
+        assertEquals(taskManager.getSingleTask(id3), tasks.get(2));
+    }
+
     private void putInManager_2SingleTasks_2EpicTasksWith_2Subtasks() {
         SingleTask singleTask1 = new SingleTask("nameSingle1", "descriptionSingle1");
         SingleTask singleTask2 = new SingleTask("nameSingle2", "descriptionSingle2");
@@ -349,5 +602,4 @@ public abstract class AbstractTaskManagerTest<T extends TaskManager> {
         taskManager.addSubTask(sub1Epic2);
         taskManager.addSubTask(sub2Epic2);
     }
-
 }

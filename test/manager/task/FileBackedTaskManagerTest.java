@@ -11,6 +11,8 @@ import task.single.SingleTask;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,12 +52,6 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
 
     @Test
     public void shouldBeEqualsAfterSaveAndLoad() {
-        Path path;
-        try {
-            path = Files.createTempFile("test", ".csv");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         TaskManager manager = Managers.getFileBackendTaskManager(path, false);
         SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
         SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
@@ -100,12 +96,6 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
 
     @Test
     public void shouldBeEqualsAfterSaveAndLoadWithDifferenceStatus() {
-        Path path;
-        try {
-            path = Files.createTempFile("test", ".csv");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         TaskManager manager = Managers.getFileBackendTaskManager(path, false);
         SingleTask singleTask1 = new SingleTask("Задача1", "Описание1");
         SingleTask singleTask2 = new SingleTask("Задача2", "Описание2");
@@ -162,6 +152,52 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
     }
 
     @Test
+    void shouldBeEqualsStartTimeAndDurationSingleTask() {
+        TaskManager manager = Managers.getFileBackendTaskManager(path, false);
+        int id = manager.addSingleTask(new SingleTask("",
+                "",
+                LocalDateTime.of(2024, 10, 12, 22, 0),
+                Duration.ofMinutes(1)));
+        SingleTask received1 = manager.getSingleTask(id);
+        received1.setStatus(Status.IN_PROGRESS);
+        manager.updateSingleTask(received1);
+        received1 = manager.getSingleTask(id);
+        TaskManager manager2 = Managers.getFileBackendTaskManager(path, true);
+        SingleTask received2 = manager2.getSingleTask(id);
+
+        assertEquals(received1, received2);
+        assertEquals(received1.getStatus(), received2.getStatus());
+    }
+
+    @Test
+    void shouldBeEqualsStartTimeAndDurationSubTaskAndEpic() {
+        TaskManager manager = Managers.getFileBackendTaskManager(path, false);
+        EpicTask epicTask = new EpicTask("", "");
+        int idEpic = manager.addEpicTask(epicTask);
+        int id = manager.addSubTask(new SubTask("",
+                "",
+                LocalDateTime.of(2024, 10, 12, 22, 0),
+                Duration.ofMinutes(1), idEpic));
+        SubTask received1 = manager.getSubTask(id);
+        received1.setStatus(Status.IN_PROGRESS);
+        manager.updateSubTask(received1);
+        received1 = manager.getSubTask(id);
+        TaskManager manager2 = Managers.getFileBackendTaskManager(path, true);
+        SubTask received2 = manager2.getSubTask(id);
+
+        assertEquals(received1, received2);
+        assertEquals(received1.getStartTime(), received2.getStartTime());
+        assertEquals(received1.getDuration(), received2.getDuration());
+
+        EpicTask receivedEpic1 = manager.getEpicTask(idEpic);
+        EpicTask receivedEpic2 = manager2.getEpicTask(idEpic);
+        assertEquals(receivedEpic1, receivedEpic2);
+        assertEquals(receivedEpic1.getStartTime(), receivedEpic2.getStartTime());
+        assertEquals(receivedEpic1.getDuration(), receivedEpic2.getDuration());
+        assertEquals(receivedEpic1.getEndTime(), receivedEpic2.getEndTime());
+    }
+
+    @Test
     void taskIdShouldBe1AfterLoadWithoutTasks() {
         TaskManager taskManager1 = Managers.getFileBackendTaskManager(path, false);
         SingleTask task = new SingleTask("", "");
@@ -186,5 +222,10 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
         TaskManager withoutLoad = Managers.getFileBackendTaskManager(path, false);
         assertEquals(1, withLoad.getAllSingleTasks().size());
         assertEquals(0, withoutLoad.getAllSingleTasks().size());
+    }
+
+    @Test
+    void testManagerSaveException() {
+        assertThrows(ManagerSaveException.class, () -> {throw new ManagerSaveException(new IOException());});
     }
 }

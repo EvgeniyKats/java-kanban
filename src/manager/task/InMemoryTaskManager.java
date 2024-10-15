@@ -8,14 +8,13 @@ import task.epic.SubTask;
 import task.single.SingleTask;
 import task.single.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     public static int DEFAULT_ID_NEXT = 1;
     private final HistoryManager historyManager = Managers.getDefaultHistory();
+    private final TaskPriorityManager taskPriorityManager = Managers.getTaskPriorityManager();
     protected final Map<Integer, SingleTask> allSingleTasks = new HashMap<>();
     protected final Map<Integer, SubTask> allSubTasks = new HashMap<>();
     protected final Map<Integer, EpicTask> allEpicTasks = new HashMap<>();
@@ -24,6 +23,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addSingleTask(SingleTask singleTask) {
         if ((singleTask.getClass() == SingleTask.class) && !allSingleTasks.containsValue(singleTask)) {
+            if (singleTask.getStartTime() != null) {
+                if (!taskPriorityManager.add(singleTask)) {
+                    return -2;
+                }
+            }
             if (singleTask.getId() == null) {
                 setTaskId(singleTask);
             }
@@ -38,6 +42,11 @@ public class InMemoryTaskManager implements TaskManager {
     public int addSubTask(SubTask subTask) {
         if ((subTask.getClass() == SubTask.class) && !allSubTasks.containsValue(subTask)
                 && allEpicTasks.containsKey(subTask.getEpicId())) {
+            if (subTask.getStartTime() != null) {
+                if (!taskPriorityManager.add(subTask)) {
+                    return -2;
+                }
+            }
             if (subTask.getId() == null) {
                 setTaskId(subTask);
             }
@@ -45,6 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
             EpicTask epicTaskOfSubTask = allEpicTasks.get(subTask.getEpicId());
             epicTaskOfSubTask.addSubTaskId(subTask.getId());
             updateStatusEpic(epicTaskOfSubTask);
+            updateTimeEpic(epicTaskOfSubTask);
             return subTask.getId();
         } else {
             return -1;
@@ -96,39 +106,25 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<SingleTask> getAllSingleTasks() {
-        List<SingleTask> result = new ArrayList<>();
-
-        for (SingleTask singleTask : allSingleTasks.values()) {
-            result.add(singleTask.getCopy());
-        }
-
-        return result;
+        return allSingleTasks.values().stream()
+                .map(SingleTask::getCopy)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<SubTask> getAllSubTasks() {
-        List<SubTask> result = new ArrayList<>();
-
-        for (SubTask subTask : allSubTasks.values()) {
-            result.add(subTask.getCopy());
-        }
-
-        return result;
+        return allSubTasks.values().stream()
+                .map(SubTask::getCopy)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<SubTask> getSubTasksFromEpic(int epicId) {
         if (allEpicTasks.containsKey(epicId)) {
-            List<SubTask> result = new ArrayList<>();
-            EpicTask epicTask = allEpicTasks.get(epicId);
-            List<Integer> subTasksId = epicTask.getSubTasksId();
-
-            for (Integer subTaskId : subTasksId) {
-                SubTask subTask = allSubTasks.get(subTaskId);
-                result.add(subTask.getCopy());
-            }
-
-            return result;
+            return allEpicTasks.get(epicId).getSubTasksId().stream()
+                    .map(allSubTasks::get)
+                    .map(SubTask::getCopy)
+                    .collect(Collectors.toList());
         } else {
             return null;
         }
@@ -136,19 +132,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<EpicTask> getAllEpicTasks() {
-        List<EpicTask> result = new ArrayList<>();
-
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            result.add(epicTask.getCopy());
-        }
-
-        return result;
+        return allEpicTasks.values().stream()
+                .map(EpicTask::getCopy)
+                .collect(Collectors.toList());
     }
 
     @Override
     public boolean updateSingleTask(SingleTask singleTask) {
         if ((singleTask.getClass() == SingleTask.class) && allSingleTasks.containsKey(singleTask.getId())) {
+            if (singleTask.getStartTime() != null && !taskPriorityManager.updateTask(singleTask)) {
+                return false;
+            }
             allSingleTasks.put(singleTask.getId(), singleTask);
+            taskPriorityManager.updateTask(singleTask);
             return true;
         } else {
             return false;
@@ -158,8 +154,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean updateSubTask(SubTask subTask) {
         if ((subTask.getClass() == SubTask.class) && allSubTasks.containsKey(subTask.getId())) {
+            if (subTask.getStartTime() != null && !taskPriorityManager.updateTask(subTask)) {
+                return false;
+            }
             allSubTasks.put(subTask.getId(), subTask);
             updateStatusEpic(allEpicTasks.get(subTask.getEpicId()));
+            updateTimeEpic(allEpicTasks.get(subTask.getEpicId()));
             return true;
         } else {
             return false;
@@ -181,6 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean removeSingleTask(int id) {
         if (allSingleTasks.containsKey(id)) {
+            taskPriorityManager.remove(allSingleTasks.get(id));
             allSingleTasks.remove(id);
             historyManager.remove(id);
             return true;
@@ -193,10 +194,12 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean removeSubTask(int id) {
         if (allSubTasks.containsKey(id)) {
             SubTask subTask = allSubTasks.remove(id);
+            taskPriorityManager.remove(subTask);
             historyManager.remove(id);
             EpicTask epicTask = allEpicTasks.get(subTask.getEpicId());
             epicTask.removeSubTaskId(subTask.getId());
             updateStatusEpic(epicTask);
+            updateTimeEpic(epicTask);
             return true;
         } else {
             return false;
@@ -208,13 +211,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (allEpicTasks.containsKey(id)) {
             EpicTask epicTask = allEpicTasks.remove(id);
             historyManager.remove(id);
-            List<Integer> subTasksId = epicTask.getSubTasksId();
-
-            for (Integer subTaskId : subTasksId) {
-                allSubTasks.remove(subTaskId);
-                historyManager.remove(subTaskId);
-            }
-
+            epicTask.getSubTasksId().stream()
+                    .peek(historyManager::remove)
+                    .map(allSubTasks::remove)
+                    .forEach(taskPriorityManager::remove);
             return true;
         } else {
             return false;
@@ -223,32 +223,30 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearAllSingleTasks() {
-        for (SingleTask singleTask : allSingleTasks.values()) {
-            historyManager.remove(singleTask.getId());
-        }
+        allSingleTasks.values().stream()
+                .peek(taskPriorityManager::remove)
+                .forEach(singleTask -> historyManager.remove(singleTask.getId()));
         allSingleTasks.clear();
     }
 
     @Override
     public void clearAllSubTasks() {
-        for (SubTask subTask : allSubTasks.values()) {
-            historyManager.remove(subTask.getId());
-        }
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            epicTask.clearSubTasksId();
-            updateStatusEpic(epicTask);
-        }
+        allSubTasks.values().stream()
+                .peek(taskPriorityManager::remove)
+                .forEach(subTask -> historyManager.remove(subTask.getId()));
+        allEpicTasks.values().stream()
+                .peek(EpicTask::clearSubTasksId)
+                .peek(this::updateStatusEpic)
+                .forEach(this::updateTimeEpic);
         allSubTasks.clear();
     }
 
     @Override
     public void clearAllEpicTasks() {
-        for (EpicTask epicTask : allEpicTasks.values()) {
-            historyManager.remove(epicTask.getId());
-        }
-        for (SubTask subTask : allSubTasks.values()) {
-            historyManager.remove(subTask.getId());
-        }
+        allEpicTasks.values().forEach(epicTask -> historyManager.remove(epicTask.getId()));
+        allSubTasks.values().stream()
+                .peek(taskPriorityManager::remove)
+                .forEach(subTask -> historyManager.remove(subTask.getId()));
         allSubTasks.clear();
         allEpicTasks.clear();
     }
@@ -257,15 +255,13 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean clearEpicSubTasks(int id) {
         if (allEpicTasks.containsKey(id)) {
             EpicTask epicTask = allEpicTasks.get(id);
-            List<Integer> subTasksId = epicTask.getSubTasksId();
-
-            for (Integer subTaskId : subTasksId) {
-                allSubTasks.remove(subTaskId);
-                historyManager.remove(subTaskId);
-            }
-
+            epicTask.getSubTasksId().stream()
+                    .peek(historyManager::remove)
+                    .map(allSubTasks::remove)
+                    .forEach(taskPriorityManager::remove);
             epicTask.clearSubTasksId();
             updateStatusEpic(epicTask);
+            updateTimeEpic(epicTask);
             return true;
         } else {
             return false;
@@ -274,6 +270,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEveryTasks() {
+        taskPriorityManager.clearAll();
         historyManager.clearHistory();
         allSingleTasks.clear();
         allSubTasks.clear();
@@ -284,6 +281,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return taskPriorityManager.getPrioritizedTasks();
     }
 
     private void updateStatusEpic(EpicTask epicTask) {
@@ -326,6 +328,48 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             epicTask.setStatus(Status.DONE);
         }
+    }
+
+    private void updateTimeEpic(EpicTask epicTask) {
+        List<SubTask> subTasks = epicTask.getSubTasksId().stream()
+                .map(allSubTasks::get)
+                .toList();
+
+        if (subTasks.isEmpty()) {
+            epicTask.setStartTime(null);
+            epicTask.setEndTime(null);
+            return;
+        }
+
+        int indexOfTaskNotNullStartTime = -1;
+
+        for (int i = 0; i < subTasks.size(); i++) {
+            if (subTasks.get(i).getStartTime() != null) {
+                indexOfTaskNotNullStartTime = i;
+                break;
+            }
+        }
+
+        if (indexOfTaskNotNullStartTime == -1) {
+            epicTask.setStartTime(null);
+            epicTask.setEndTime(null);
+            return;
+        }
+
+        SubTask firstSubTask = subTasks.get(indexOfTaskNotNullStartTime);
+        SubTask lastSubTask = subTasks.get(indexOfTaskNotNullStartTime);
+        for (int i = indexOfTaskNotNullStartTime; i < subTasks.size(); i++) {
+            SubTask temp = subTasks.get(i);
+            if (temp.getStartTime() != null) {
+                if (temp.compareTo(lastSubTask) > 0) {
+                    lastSubTask = temp;
+                } else if (temp.compareTo(firstSubTask) < 0) {
+                    firstSubTask = temp;
+                }
+            }
+        }
+        epicTask.setStartTime(firstSubTask.getStartTime());
+        epicTask.setEndTime(lastSubTask.getEndTime());
     }
 
     private void setTaskId(SingleTask task) {
