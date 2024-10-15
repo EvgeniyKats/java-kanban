@@ -191,6 +191,15 @@ public class JsonTaskOptionTest {
         assertEquals(tasks2, tasksFromJson2);
     }
 
+    @Test
+    void shouldBeSuccessSerializationDeserializationEmptyList() {
+        List<Task> tasks = new ArrayList<>();
+        String json = JsonTaskOption.listOfTasksToJson(tasks);
+        List<Task> tasks1 = JsonTaskOption.getListOfTasksFromJson(json);
+        assertEquals(tasks, tasks1);
+        assertEquals("[]", json);
+    }
+
     private void assertEqualsTasks(Task task1, Task task2) {
         assertEquals(task1, task2);
         assertEquals(task1.getId(), task2.getId());
