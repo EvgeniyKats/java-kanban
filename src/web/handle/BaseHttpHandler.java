@@ -1,4 +1,4 @@
-package web;
+package web.handle;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -12,7 +12,7 @@ public class BaseHttpHandler {
     protected static final int STATUS_HAS_INTERACTIONS= 406;
     protected static final int STATUS_INTERNAL_SERVER_ERROR = 500;
 
-    private BaseHttpHandler() {
+    public BaseHttpHandler() {
     }
 
     protected void sendText(HttpExchange httpExchange, String text, int statusCode) throws IOException {
