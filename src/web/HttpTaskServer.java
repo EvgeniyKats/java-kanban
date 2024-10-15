@@ -3,6 +3,7 @@ package web;
 import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.task.TaskManager;
+import web.handle.SingleTaskHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,6 +19,7 @@ public class HttpTaskServer {
             isAlive = false;
             manager = Managers.getDefault();
             httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
+            httpServer.createContext("/tasks", new SingleTaskHandler());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
