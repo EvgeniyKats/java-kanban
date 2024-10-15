@@ -10,6 +10,8 @@ import task.single.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -153,6 +155,40 @@ public class JsonTaskOptionTest {
         assertTrue(optional1.isEmpty());
         assertTrue(optional2.isEmpty());
         assertTrue(optional3.isEmpty());
+    }
+
+    @Test
+    void shouldBeEqualsListOfTask() {
+        SingleTask singleTask1 = new SingleTask("", "");
+        SingleTask singleTask2 = new SingleTask("",
+                "",
+                LocalDateTime.of(2024, 10, 15, 21, 45),
+                Duration.ofMinutes(1));
+        EpicTask epicTask = new EpicTask("", "");
+        TaskManager taskManager = new InMemoryTaskManager();
+        int id = taskManager.addEpicTask(epicTask);
+        SubTask subTask1 = new SubTask("", "", id);
+        SubTask subTask2 = new SubTask("",
+                "",
+                LocalDateTime.of(2024, 10, 15, 21, 46),
+                Duration.ofMinutes(1),
+                id);
+        taskManager.getSingleTask(taskManager.addSingleTask(singleTask1));
+        taskManager.getSingleTask(taskManager.addSingleTask(singleTask2));
+        taskManager.getSubTask(taskManager.addSubTask(subTask1));
+        taskManager.getSubTask(taskManager.addSubTask(subTask2));
+        taskManager.getEpicTask(id);
+
+        List<Task> tasks1 = taskManager.getPrioritizedTasks();
+        List<Task> tasks2 = taskManager.getHistory();
+        String jsonTasks1 = JsonTaskOption.listOfTasksToJson(tasks1);
+        String jsonTasks2 = JsonTaskOption.listOfTasksToJson(tasks2);
+
+        List<Task> tasksFromJson1 = JsonTaskOption.getListOfTasksFromJson(jsonTasks1);
+        List<Task> tasksFromJson2 = JsonTaskOption.getListOfTasksFromJson(jsonTasks2);
+
+        assertEquals(tasks1, tasksFromJson1);
+        assertEquals(tasks2, tasksFromJson2);
     }
 
     private void assertEqualsTasks(Task task1, Task task2) {

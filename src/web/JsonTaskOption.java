@@ -1,8 +1,7 @@
 package web;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import task.TaskType;
@@ -15,12 +14,14 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 public class JsonTaskOption {
     private final static Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
+            .registerTypeAdapter(Task.class, new TaskAdapter())
             .create();
 
     private JsonTaskOption() {
@@ -28,6 +29,15 @@ public class JsonTaskOption {
 
     public static String taskToJson(Task task) {
         return gson.toJson(task);
+    }
+
+    public static String listOfTasksToJson(List<Task> tasks) {
+        System.out.println(gson.toJson(tasks, new TaskTypeToken().getType()));
+        return gson.toJson(tasks, new TaskTypeToken().getType());
+    }
+
+    public static List<Task> getListOfTasksFromJson(String json) {
+        return gson.fromJson(json, new TaskTypeToken().getType());
     }
 
     public static Optional<SingleTask> getSingleTaskFromJson(String json) {
@@ -104,5 +114,32 @@ public class JsonTaskOption {
         public Duration read(JsonReader jsonReader) throws IOException {
             return Duration.ofMinutes(Long.parseLong(jsonReader.nextString()));
         }
+    }
+
+    static class TaskAdapter extends TypeAdapter<Task> {
+        @Override
+        public void write(JsonWriter jsonWriter, Task task) throws IOException {
+            jsonWriter.value(gson.toJson(task));
+        }
+
+        @Override
+        public Task read(JsonReader jsonReader) throws IOException {
+            String json = jsonReader.nextString();
+            JsonElement jsonElement = JsonParser.parseString(json);
+            String taskType = jsonElement.getAsJsonObject().get("taskType").getAsString();
+            if (taskType.equals(TaskType.SINGLE_TASK.name())) {
+                return getSingleTaskFromJson(json).orElse(null);
+            } else if (taskType.equals(TaskType.SUB_TASK.name())) {
+                return getSubTaskFromJson(json).orElse(null);
+            } else if (taskType.equals(TaskType.EPIC_TASK.name())) {
+                return getEpicTaskFromJson(json).orElse(null);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    static class TaskTypeToken extends TypeToken<List<Task>> {
+
     }
 }
