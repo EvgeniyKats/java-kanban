@@ -17,13 +17,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-public class JsonOption {
+public class JsonTaskOption {
     private final static Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
             .create();
 
-    private JsonOption() {
+    private JsonTaskOption() {
     }
 
     public static String taskToJson(Task task) {

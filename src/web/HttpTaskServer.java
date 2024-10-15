@@ -6,7 +6,6 @@ import manager.task.TaskManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 public class HttpTaskServer {
     private final static int PORT = 8080;
