@@ -23,9 +23,9 @@ public class HttpTaskServer {
     protected HttpTaskServer() {
         isAlive = false;
         if (useFileBackendTaskManager) {
-            manager = Managers.getDefault();
-        } else {
             manager = Managers.getFileBackendTaskManager(path, needToRestoreTasks);
+        } else {
+            manager = Managers.getDefault();
         }
     }
 
@@ -67,7 +67,7 @@ public class HttpTaskServer {
 
     public static void main(String[] args) {
         try {
-            if (args[0].equals("1")) {
+            if (args[0].equals("true")) {
                 useFileBackendTaskManager = true;
                 path = Paths.get(args[1]);
                 needToRestoreTasks = Boolean.parseBoolean(args[2]);
