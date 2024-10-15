@@ -1,6 +1,8 @@
 package web;
 
 import com.sun.net.httpserver.HttpServer;
+import manager.Managers;
+import manager.task.TaskManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,9 +11,13 @@ import java.util.Arrays;
 public class HttpTaskServer {
     private final static int PORT = 8080;
     private final HttpServer httpServer;
+    private final TaskManager manager;
+    private boolean isAlive;
 
     private HttpTaskServer() {
         try {
+            isAlive = false;
+            manager = Managers.getDefault();
             httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -27,20 +33,28 @@ public class HttpTaskServer {
     }
 
     public void start() {
-        httpServer.start();
+        synchronized (getInstance()) {
+            if (isAlive) {
+                System.out.println("Сервер уже запущен: " + httpServer.getAddress());
+            } else {
+                httpServer.start();
+                isAlive = true;
+            }
+        }
     }
 
     public void stop() {
-        httpServer.stop(0);
+        synchronized (getInstance()) {
+            httpServer.stop(0);
+            isAlive = false;
+        }
+    }
+
+    public synchronized TaskManager getManager() {
+        return manager;
     }
 
     public static void main(String[] args) {
-        try {
-            getInstance().start();
-        } catch (Throwable throwable) {
-            System.out.println("Неизвестная ошибка: " + Arrays.toString(throwable.getStackTrace()));
-        } finally {
-            getInstance().stop();
-        }
+        getInstance().start();
     }
 }
