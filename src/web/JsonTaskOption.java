@@ -31,8 +31,7 @@ public class JsonTaskOption {
         return gson.toJson(task);
     }
 
-    public static String listOfTasksToJson(List<Task> tasks) {
-        System.out.println(gson.toJson(tasks, new TaskTypeToken().getType()));
+    public static String listOfTasksToJson(List<? extends Task> tasks) {
         return gson.toJson(tasks, new TaskTypeToken().getType());
     }
 
