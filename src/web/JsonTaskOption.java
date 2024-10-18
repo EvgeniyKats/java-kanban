@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class JsonTaskOption {
-    private final static Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
             .registerTypeAdapter(Task.class, new TaskAdapter())
