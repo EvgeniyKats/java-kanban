@@ -2,7 +2,6 @@ package web;
 
 import manager.task.TaskManager;
 import org.junit.jupiter.api.Test;
-import task.single.SingleTask;
 import task.single.Task;
 import web.handle.BaseHttpHandler;
 
@@ -24,8 +23,7 @@ public abstract class AbstractTasksHandlersTest {
 
     @Test
     void shouldBeBadRequestWithBadURI() throws IOException, InterruptedException {
-        SingleTask singleTask = new SingleTask("", "");
-        String taskJson = JsonTaskOption.taskToJson(singleTask);
+        String taskJson = JsonTaskOption.taskToJson(task);
 
         URI url = URI.create(BASE_URL + partPath + "/some");
         HttpRequest request = HttpRequest.newBuilder()
