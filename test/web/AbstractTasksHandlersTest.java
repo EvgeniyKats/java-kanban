@@ -110,6 +110,20 @@ public abstract class AbstractTasksHandlersTest<T extends Task> {
         assertEquals(taskInManager.getDescription(), received.getDescription());
     }
 
+    @Test
+    void shouldBeNotFoundWithMaxInteger() throws IOException, InterruptedException {
+        HttpResponse<String> response = getTaskResponse(client, Integer.MAX_VALUE);
+        assertEquals(BaseHttpHandler.STATUS_NOT_FOUND, response.statusCode());
+    }
+
+    @Test
+    void shouldBeBadRequestIfIdMoreThanMaxInteger() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + startOfPath + "/" + "2147483648")) // 2147483647 = MAX
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
+    }
 
     @Test
     void shouldBeSuccessGet3Tasks() throws IOException, InterruptedException {

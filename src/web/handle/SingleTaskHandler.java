@@ -38,7 +38,6 @@ public class SingleTaskHandler extends BaseHttpHandler implements HttpHandler {
                         } else {
                             sendSuccessWithBody(exchange, JsonTaskOption.taskToJson(st));
                         }
-
                     } else {
                         sendBadRequest(exchange, "Не удалось получить id задачи: " + pathSplits[2]);
                     }

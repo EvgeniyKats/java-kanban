@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 public class BaseHttpHandler {
     private static final int MAX_INTEGER_FIRST_5_NUMBERS = 21474;
-    private static final int MAX_INTEGER_LAST_6_NUMBERS = 83647;
-    private static final int MAX_INTEGER_SYMBOLS_COUNT = 11;
+    private static final int MAX_INTEGER_LAST_5_NUMBERS = 83647;
+    private static final int MAX_INTEGER_SYMBOLS_COUNT = 10;
     public static final int STATUS_SUCCESS_WITH_DATA = 200;
     public static final int STATUS_SUCCESS_WITHOUT_DATA = 201;
     public static final int STATUS_BAD_REQUEST = 400;
@@ -87,8 +87,8 @@ public class BaseHttpHandler {
             } else if (first5Symbols < MAX_INTEGER_FIRST_5_NUMBERS) {
                 return true;
             } else {
-                int last6Symbols = Integer.parseInt(s.substring(5, 11));
-                return last6Symbols <= MAX_INTEGER_LAST_6_NUMBERS;
+                int last6Symbols = Integer.parseInt(s.substring(5, 10));
+                return last6Symbols <= MAX_INTEGER_LAST_5_NUMBERS;
             }
         } else {
             return true;
