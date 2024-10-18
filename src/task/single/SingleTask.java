@@ -132,7 +132,11 @@ public class SingleTask implements Task {
 
     @Override
     public LocalDateTime getEndTime() {
-        return startTime.plus(duration);
+        if (startTime == null || duration == null) {
+            return null;
+        } else {
+            return startTime.plus(duration);
+        }
     }
 
     @Override
