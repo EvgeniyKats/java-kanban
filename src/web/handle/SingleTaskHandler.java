@@ -55,7 +55,6 @@ public class SingleTaskHandler extends BaseHttpHandler implements HttpHandler {
                 }
                 InputStream is = exchange.getRequestBody();
                 String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
                 Optional<SingleTask> optional = JsonTaskOption.getSingleTaskFromJson(body);
                 if (optional.isPresent()) {
                     SingleTask singleTask = optional.get();
