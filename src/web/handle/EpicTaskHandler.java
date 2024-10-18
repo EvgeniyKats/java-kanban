@@ -25,13 +25,26 @@ public class EpicTaskHandler extends BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
         String[] pathSplits = path.split("/");
-        if (pathSplits.length > 3) {
-            sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
-        }
 
         switch (exchange.getRequestMethod()) {
             case "GET" -> {
-                if (pathSplits.length == 3) {
+                if (pathSplits.length > 4) {
+                    sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
+                }
+                if (pathSplits.length == 4) {
+                    if (isPositiveInteger(pathSplits[2])) {
+                        int id = Integer.parseInt(pathSplits[2]);
+                        EpicTask epic = manager.getEpicTask(id);
+                        if (epic == null) {
+                            sendNotFound(exchange, "Task id: " + id + " отсутствует.");
+                        } else {
+                            sendSuccessWithBody(exchange, JsonTaskOption.listOfIntegersToJson(epic.getSubTasksId()));
+                        }
+
+                    } else {
+                        sendBadRequest(exchange, "Не удалось получить id задачи: " + pathSplits[2]);
+                    }
+                } else if (pathSplits.length == 3) {
                     if (isPositiveInteger(pathSplits[2])) {
                         int id = Integer.parseInt(pathSplits[2]);
                         EpicTask epic = manager.getEpicTask(id);
@@ -51,7 +64,7 @@ public class EpicTaskHandler extends BaseHttpHandler implements HttpHandler {
                 }
             }
             case "POST" -> {
-                if (pathSplits.length == 3) {
+                if (pathSplits.length != 2) {
                     sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
                     return;
                 }
@@ -81,11 +94,10 @@ public class EpicTaskHandler extends BaseHttpHandler implements HttpHandler {
                 }
             }
             case "DELETE" -> {
-                if (pathSplits.length == 2) {
+                if (pathSplits.length != 3) {
                     sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
                     return;
                 }
-
                 if (isPositiveInteger(pathSplits[2])) {
                     int id = Integer.parseInt(pathSplits[2]);
                     boolean success = manager.removeEpicTask(id);
