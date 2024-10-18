@@ -1,4 +1,4 @@
-package web;
+package web.handle;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
-import web.handle.BaseHttpHandler;
+import web.HttpTaskServer;
+import web.JsonTaskOption;
 
 import java.io.IOException;
 import java.net.URI;

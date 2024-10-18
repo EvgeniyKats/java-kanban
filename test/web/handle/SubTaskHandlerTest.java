@@ -1,30 +1,32 @@
-package web;
+package web.handle;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.epic.EpicTask;
+import task.epic.SubTask;
 import task.single.SingleTask;
-import web.handle.BaseHttpHandler;
+import web.HttpTaskServer;
+import web.JsonTaskOption;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SingleTaskHandlerTest extends AbstractTasksHandlersTest<SingleTask> {
+public class SubTaskHandlerTest extends AbstractTasksHandlersTest<SubTask> {
     @BeforeEach
     void beforeEach() throws IOException {
-        task = new SingleTask("", "");
-        startOfPath = "tasks";
+        manager.addEpicTask(new EpicTask("", ""));
+        task = new SubTask("", "", 1);
+        startOfPath = "subtasks";
         client = HttpClient.newHttpClient();
         HttpTaskServer.getInstance().start();
         manager.clearEveryTasks();
+        manager.addEpicTask(new EpicTask("", ""));
     }
 
     @AfterEach
@@ -34,20 +36,13 @@ public class SingleTaskHandlerTest extends AbstractTasksHandlersTest<SingleTask>
     }
 
     @Test
-    void shouldBeNotSuccessAddedSingleTaskAsEpic() throws IOException, InterruptedException {
-        EpicTask epicTask = new EpicTask("   Test 1 $ @   ", "   Testing task 1  ");
-        String taskJson = JsonTaskOption.taskToJson(epicTask);
+    void shouldBeNotSuccessAddedSingleTaskAsSubTask() throws IOException, InterruptedException {
+        SingleTask singleTask = new SingleTask("   Test 1 $ @   ", "   Testing task 1  ");
 
-        URI url = URI.create(BASE_URL + startOfPath);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = addOrUpdateTaskResponse(client, singleTask);
         assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
 
-        List<EpicTask> tasksFromManager = manager.getAllEpicTasks();
+        List<SubTask> tasksFromManager = manager.getAllSubTasks();
         List<SingleTask> tasksFromManager2 = manager.getAllSingleTasks();
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(0, tasksFromManager.size(), "Некорректное количество задач");
@@ -55,12 +50,12 @@ public class SingleTaskHandlerTest extends AbstractTasksHandlersTest<SingleTask>
     }
 
     @Override
-    public List<SingleTask> getListOfTasksFromManager() {
-        return manager.getAllSingleTasks();
+    public List<SubTask> getListOfTasksFromManager() {
+        return manager.getAllSubTasks();
     }
 
     @Override
-    public Optional<SingleTask> getTaskFromJson(String json) {
-        return JsonTaskOption.getSingleTaskFromJson(json);
+    public Optional<SubTask> getTaskFromJson(String json) {
+        return JsonTaskOption.getSubTaskFromJson(json);
     }
 }
