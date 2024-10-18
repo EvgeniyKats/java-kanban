@@ -15,7 +15,7 @@ public class HttpTaskServer {
     private static boolean useFileBackendTaskManager = false;
     private static boolean needToRestoreTasks = false;
     private static Path path = null;
-    private final static int PORT = 8080;
+    private static final int PORT = 8080;
     private HttpServer httpServer;
     private final TaskManager manager;
     private boolean isAlive;
