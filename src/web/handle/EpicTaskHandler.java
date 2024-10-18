@@ -75,17 +75,19 @@ public class EpicTaskHandler extends BaseHttpHandler implements HttpHandler {
                 if (optional.isPresent()) {
                     EpicTask epicTask = optional.get();
                     try {
+                        boolean success;
                         if (epicTask.getId() == null) {
-                            manager.addEpicTask(epicTask);
+                            success = manager.addEpicTask(epicTask) > 0;
                         } else {
-                            boolean success = manager.updateEpicTask(epicTask);
-                            if (!success) {
-                                sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
-                                        "или задача отсутствует.");
-                                return;
-                            }
+                            success = manager.updateEpicTask(epicTask);
                         }
-                        sendSuccessWithoutBody(exchange);
+
+                        if (success) {
+                            sendSuccessWithoutBody(exchange);
+                        } else {
+                            sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
+                                    "или задача отсутствует.");
+                        }
                     } catch (ManagerSaveException e) {
                         sendInternalServerError(exchange, Arrays.toString(e.getStackTrace()));
                     }

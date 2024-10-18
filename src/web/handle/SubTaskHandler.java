@@ -61,17 +61,19 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
                 if (optional.isPresent()) {
                     SubTask subTask = optional.get();
                     try {
+                        boolean success;
                         if (subTask.getId() == null) {
-                            manager.addSubTask(subTask);
+                            success = manager.addSubTask(subTask) > 0;
                         } else {
-                            boolean success = manager.updateSubTask(subTask);
-                            if (!success) {
-                                sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
-                                        "или задача отсутствует.");
-                                return;
-                            }
+                            success = manager.updateSubTask(subTask);
                         }
-                        sendSuccessWithoutBody(exchange);
+
+                        if (success) {
+                            sendSuccessWithoutBody(exchange);
+                        } else {
+                            sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
+                                    "или задача отсутствует.");
+                        }
                     } catch (ManagerSaveException e) {
                         sendInternalServerError(exchange, Arrays.toString(e.getStackTrace()));
                     }

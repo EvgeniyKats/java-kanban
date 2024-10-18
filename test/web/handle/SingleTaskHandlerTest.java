@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +55,19 @@ public class SingleTaskHandlerTest extends AbstractTasksHandlersTest<SingleTask>
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(0, tasksFromManager.size(), "Некорректное количество задач");
         assertEquals(0, tasksFromManager2.size(), "Некорректное количество задач");
+    }
+
+    @Test
+    void shouldBeInteractionsIfTimeOverlay() throws IOException, InterruptedException {
+        SingleTask singleTask = new SingleTask("",
+                "",
+                LocalDateTime.of(2024, 10, 18, 23, 30),
+                Duration.ofMinutes(1));
+        HttpResponse<String> response = addOrUpdateTaskResponse(client, singleTask);
+        assertEquals(BaseHttpHandler.STATUS_SUCCESS_WITHOUT_DATA, response.statusCode());
+
+        response = addOrUpdateTaskResponse(client, singleTask);
+        assertEquals(BaseHttpHandler.STATUS_HAS_INTERACTIONS, response.statusCode());
     }
 
     @Override

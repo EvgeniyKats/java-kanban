@@ -48,7 +48,7 @@ public class SingleTaskHandler extends BaseHttpHandler implements HttpHandler {
                 }
             }
             case "POST" -> {
-                if (pathSplits.length != 2){
+                if (pathSplits.length != 2) {
                     sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
                     return;
                 }
@@ -58,17 +58,19 @@ public class SingleTaskHandler extends BaseHttpHandler implements HttpHandler {
                 if (optional.isPresent()) {
                     SingleTask singleTask = optional.get();
                     try {
+                        boolean success;
                         if (singleTask.getId() == null) {
-                            manager.addSingleTask(singleTask);
+                            success = manager.addSingleTask(singleTask) > 0;
                         } else {
-                            boolean success = manager.updateSingleTask(singleTask);
-                            if (!success) {
-                                sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
-                                        "или задача отсутствует.");
-                                return;
-                            }
+                            success = manager.updateSingleTask(singleTask);
                         }
-                        sendSuccessWithoutBody(exchange);
+
+                        if (success) {
+                            sendSuccessWithoutBody(exchange);
+                        } else {
+                            sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
+                                    "или задача отсутствует.");
+                        }
                     } catch (ManagerSaveException e) {
                         sendInternalServerError(exchange, Arrays.toString(e.getStackTrace()));
                     }
