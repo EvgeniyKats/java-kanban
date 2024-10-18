@@ -1,6 +1,5 @@
 package web;
 
-import manager.task.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +19,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SingleTaskHandlerTest {
-    private HttpClient client;
-    private final TaskManager manager = HttpTaskServer.getInstance().getManager();
-    private static final String BASE_URL = "http://localhost:8080/";
-
+public class SingleTaskHandlerTest extends AbstractTasksHandlersTest {
     @BeforeEach
     void beforeEach() throws IOException {
+        task = new SingleTask("", "");
+        partPath = "tasks";
         client = HttpClient.newHttpClient();
         HttpTaskServer.getInstance().start();
         manager.clearEveryTasks();
@@ -36,39 +33,6 @@ public class SingleTaskHandlerTest {
     void afterEach() {
         client.close();
         HttpTaskServer.getInstance().stop();
-    }
-
-    @Test
-    void shouldBeBadRequestWithBadURI() throws IOException, InterruptedException {
-        SingleTask singleTask = new SingleTask("", "");
-        String taskJson = JsonTaskOption.taskToJson(singleTask);
-
-        URI url = URI.create(BASE_URL + "tasks/some");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
-
-        url = URI.create(BASE_URL + "tasks/4/4");
-        request = HttpRequest.newBuilder()
-                .uri(url)
-                .GET()
-                .build();
-
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
-
-        url = URI.create(BASE_URL + "tasks");
-        request = HttpRequest.newBuilder()
-                .uri(url)
-                .DELETE()
-                .build();
-
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
     }
 
     //POST TESTING:
@@ -90,21 +54,6 @@ public class SingleTaskHandlerTest {
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
         assertEquals(singleTask.getName(), tasksFromManager.getFirst().getName(), "Некорректное имя задачи");
-    }
-
-    @Test
-    void shouldBeNotAddedSingleTaskWithUnsupportedMethod() throws IOException, InterruptedException {
-        SingleTask singleTask = new SingleTask("   Test 1 $ @   ", "   Testing task 1  ");
-        String taskJson = JsonTaskOption.taskToJson(singleTask);
-
-        URI url = URI.create(BASE_URL + "tasks");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .PUT(HttpRequest.BodyPublishers.ofString(taskJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_METHOD_NOT_ALLOWED, response.statusCode());
     }
 
     @Test
@@ -162,7 +111,7 @@ public class SingleTaskHandlerTest {
     }
 
     @Test
-    void shouldBeNotUpdateSingleTask() throws IOException, InterruptedException {
+    void shouldBeNotUpdateTaskIfNotExistInManager() throws IOException, InterruptedException {
         SingleTask singleTask = new SingleTask("   Test 1 $ @   ", "   Testing task 1  ");
         singleTask.setId(1);
         String taskJson = JsonTaskOption.taskToJson(singleTask);
@@ -179,21 +128,6 @@ public class SingleTaskHandlerTest {
         List<SingleTask> tasksFromManager = manager.getAllSingleTasks();
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(0, tasksFromManager.size(), "Некорректное количество задач");
-    }
-
-    @Test
-    void shouldBeNotUpdateSingleTaskWithBadId() throws IOException, InterruptedException {
-        SingleTask singleTask = new SingleTask("", "");
-        singleTask.setId(1999);
-        String jsonTask = JsonTaskOption.taskToJson(singleTask).replace("1999", "13x");
-        URI url = URI.create(BASE_URL + "tasks");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(jsonTask))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
     }
 
     //GET TESTING:
@@ -218,48 +152,6 @@ public class SingleTaskHandlerTest {
         assertEquals(singleTask.getDescription(), received.getDescription());
     }
 
-    @Test
-    void shouldBeSuccessGet3SingleTasks() throws IOException, InterruptedException {
-        SingleTask singleTask = new SingleTask("n", "d");
-        manager.addSingleTask(singleTask.getCopy());
-        manager.addSingleTask(singleTask.getCopy());
-        manager.addSingleTask(singleTask.getCopy());
-        URI url = URI.create(BASE_URL + "tasks/");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        List<Task> list = JsonTaskOption.getListOfTasksFromJson(response.body());
-        assertEquals(3, list.size());
-        assertEquals(manager.getAllSingleTasks(), list);
-    }
-
-    @Test
-    void shouldBeNotGetNotExistTask() throws IOException, InterruptedException {
-        URI url = URI.create(BASE_URL + "tasks/1");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_NOT_FOUND, response.statusCode());
-    }
-
-    @Test
-    void shouldBeBadRequestGetTaskWithBadId() throws IOException, InterruptedException {
-        URI url = URI.create(BASE_URL + "tasks/notNumber");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
-    }
-
     //DELETE TESTING:
 
     @Test
@@ -274,41 +166,5 @@ public class SingleTaskHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(BaseHttpHandler.STATUS_SUCCESS_WITHOUT_DATA, response.statusCode());
         assertEquals(0, manager.getAllSingleTasks().size());
-    }
-
-    @Test
-    void shouldBeNotFoundDeleteWithNotExistId() throws IOException, InterruptedException {
-        URI url = URI.create(BASE_URL + "tasks/1");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .DELETE()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_NOT_FOUND, response.statusCode());
-    }
-
-    @Test
-    void shouldBeBadRequestDeleteWithBadId() throws IOException, InterruptedException {
-        URI url = URI.create(BASE_URL + "tasks/1/some");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .DELETE()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
-    }
-
-    @Test
-    void shouldBeBadRequestDeleteWithBadURI() throws IOException, InterruptedException {
-        URI url = URI.create(BASE_URL + "tasks/notNumber");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .DELETE()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(BaseHttpHandler.STATUS_BAD_REQUEST, response.statusCode());
     }
 }
