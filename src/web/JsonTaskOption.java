@@ -27,12 +27,20 @@ public class JsonTaskOption {
     private JsonTaskOption() {
     }
 
+    public static String listOfIntegersToJson(List<Integer> list) {
+        return gson.toJson(list);
+    }
+
     public static String taskToJson(Task task) {
         return gson.toJson(task);
     }
 
     public static String listOfTasksToJson(List<? extends Task> tasks) {
         return gson.toJson(tasks, new TaskTypeToken().getType());
+    }
+
+    public static List<Integer> getListOfIntegersFromJson(String json) {
+        return gson.fromJson(json, new IntegerTypeToken().getType());
     }
 
     public static List<Task> getListOfTasksFromJson(String json) {
@@ -151,6 +159,10 @@ public class JsonTaskOption {
     }
 
     static class TaskTypeToken extends TypeToken<List<Task>> {
+
+    }
+
+    static class IntegerTypeToken extends TypeToken<List<Integer>> {
 
     }
 }

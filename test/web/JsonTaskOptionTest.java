@@ -158,7 +158,7 @@ public class JsonTaskOptionTest {
     }
 
     @Test
-    void shouldBeEqualsListOfTask() {
+    void shouldBeEqualsListsOfTask() {
         SingleTask singleTask1 = new SingleTask("", "");
         SingleTask singleTask2 = new SingleTask("",
                 "",
@@ -198,6 +198,14 @@ public class JsonTaskOptionTest {
         List<Task> tasks1 = JsonTaskOption.getListOfTasksFromJson(json);
         assertEquals(tasks, tasks1);
         assertEquals("[]", json);
+    }
+
+    @Test
+    void shouldBeEqualsListsOfIntegers() {
+        List<Integer> list = List.of(1, 2, 3, 4, 5);
+        String json = JsonTaskOption.listOfIntegersToJson(list);
+        List<Integer> list2 = JsonTaskOption.getListOfIntegersFromJson(json);
+        assertEquals(list, list2);
     }
 
     private void assertEqualsTasks(Task task1, Task task2) {
