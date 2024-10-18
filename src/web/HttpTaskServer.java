@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.task.TaskManager;
 import web.handle.EpicTaskHandler;
+import web.handle.HistoryHandler;
 import web.handle.SingleTaskHandler;
 import web.handle.SubTaskHandler;
 
@@ -48,6 +49,7 @@ public class HttpTaskServer {
                 httpServer.createContext("/tasks", new SingleTaskHandler(manager));
                 httpServer.createContext("/subtasks", new SubTaskHandler(manager));
                 httpServer.createContext("/epics", new EpicTaskHandler(manager));
+                httpServer.createContext("/history", new HistoryHandler(manager));
                 httpServer.start();
                 isAlive = true;
                 return true;
