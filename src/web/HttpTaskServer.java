@@ -3,7 +3,9 @@ package web;
 import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.task.TaskManager;
+import web.handle.EpicTaskHandler;
 import web.handle.SingleTaskHandler;
+import web.handle.SubTaskHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -44,6 +46,8 @@ public class HttpTaskServer {
             } else {
                 httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
                 httpServer.createContext("/tasks", new SingleTaskHandler(manager));
+                httpServer.createContext("/subtasks", new SubTaskHandler(manager));
+                httpServer.createContext("/epics", new EpicTaskHandler(manager));
                 httpServer.start();
                 isAlive = true;
                 return true;
