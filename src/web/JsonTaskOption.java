@@ -43,10 +43,14 @@ public class JsonTaskOption {
         if (isStringNullOrEmpty(json)) {
             return Optional.empty();
         }
-        SingleTask singleTask = gson.fromJson(json, SingleTask.class);
-        if (singleTask.getTaskType().equals(TaskType.SINGLE_TASK)) {
-            return Optional.of(singleTask);
-        } else {
+        try {
+            SingleTask singleTask = gson.fromJson(json, SingleTask.class);
+            if (singleTask.getTaskType().equals(TaskType.SINGLE_TASK)) {
+                return Optional.of(singleTask);
+            } else {
+                return Optional.empty();
+            }
+        } catch (JsonSyntaxException e) {
             return Optional.empty();
         }
     }
@@ -55,10 +59,14 @@ public class JsonTaskOption {
         if (isStringNullOrEmpty(json)) {
             return Optional.empty();
         }
-        SubTask subTask = gson.fromJson(json, SubTask.class);
-        if (subTask.getTaskType().equals(TaskType.SUB_TASK)) {
-            return Optional.of(subTask);
-        } else {
+        try {
+            SubTask subTask = gson.fromJson(json, SubTask.class);
+            if (subTask.getTaskType().equals(TaskType.SUB_TASK)) {
+                return Optional.of(subTask);
+            } else {
+                return Optional.empty();
+            }
+        } catch (JsonSyntaxException e) {
             return Optional.empty();
         }
     }
@@ -67,10 +75,14 @@ public class JsonTaskOption {
         if (isStringNullOrEmpty(json)) {
             return Optional.empty();
         }
-        EpicTask epicTask = gson.fromJson(json, EpicTask.class);
-        if (epicTask.getTaskType().equals(TaskType.EPIC_TASK)) {
-            return Optional.of(epicTask);
-        } else {
+        try {
+            EpicTask epicTask = gson.fromJson(json, EpicTask.class);
+            if (epicTask.getTaskType().equals(TaskType.EPIC_TASK)) {
+                return Optional.of(epicTask);
+            } else {
+                return Optional.empty();
+            }
+        } catch (JsonSyntaxException e) {
             return Optional.empty();
         }
     }
