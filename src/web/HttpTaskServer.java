@@ -40,11 +40,10 @@ public class HttpTaskServer {
     public boolean start() throws IOException {
         synchronized (getInstance()) {
             if (isAlive) {
-                System.out.println("Сервер уже запущен: " + httpServer.getAddress());
                 return false;
             } else {
                 httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-                httpServer.createContext("/tasks", new SingleTaskHandler());
+                httpServer.createContext("/tasks", new SingleTaskHandler(manager));
                 httpServer.start();
                 isAlive = true;
                 return true;
