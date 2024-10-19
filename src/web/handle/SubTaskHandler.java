@@ -54,27 +54,27 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
                 }
                 String body = readBody(exchange);
                 Optional<SubTask> optional = JsonTaskOption.getSubTaskFromJson(body);
-                if (optional.isPresent()) {
-                    SubTask subTask = optional.get();
-                    try {
-                        boolean success;
-                        if (subTask.getId() == null) {
-                            success = manager.addSubTask(subTask) > 0;
-                        } else {
-                            success = manager.updateSubTask(subTask);
-                        }
-
-                        if (success) {
-                            sendSuccessWithoutBody(exchange);
-                        } else {
-                            sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
-                                    "или задача отсутствует.");
-                        }
-                    } catch (ManagerSaveException e) {
-                        sendInternalServerError(exchange, Arrays.toString(e.getStackTrace()));
-                    }
-                } else {
+                if (optional.isEmpty()) {
                     sendBadRequest(exchange, "Не удалось получить задачу из тела: " + body);
+                    return;
+                }
+                SubTask subTask = optional.get();
+                try {
+                    boolean success;
+                    if (subTask.getId() == null) {
+                        success = manager.addSubTask(subTask) > 0;
+                    } else {
+                        success = manager.updateSubTask(subTask);
+                    }
+
+                    if (success) {
+                        sendSuccessWithoutBody(exchange);
+                    } else {
+                        sendHasInteractions(exchange, "Ошибка, время задачи пересекается с существующими " +
+                                "или задача отсутствует.");
+                    }
+                } catch (ManagerSaveException e) {
+                    sendInternalServerError(exchange, Arrays.toString(e.getStackTrace()));
                 }
             }
             case "DELETE" -> {
