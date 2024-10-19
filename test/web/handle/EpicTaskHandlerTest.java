@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import task.epic.EpicTask;
 import task.epic.SubTask;
 import task.single.SingleTask;
+import task.single.Task;
 import web.HttpTaskServer;
 import web.JsonTaskOption;
 
@@ -105,9 +106,9 @@ public class EpicTaskHandlerTest extends AbstractTasksHandlersTest<EpicTask> {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(BaseHttpHandler.STATUS_SUCCESS_WITH_DATA, response.statusCode());
-        List<Integer> list = JsonTaskOption.getListOfIntegersFromJson(response.body());
-        assertEquals(5, epicTask.getSubTasksId().size());
-        assertEquals(epicTask.getSubTasksId(), list);
+        List<Task> list = JsonTaskOption.getListOfTasksFromJson(response.body());
+        assertEquals(5, manager.getSubTasksFromEpic(id).size());
+        assertEquals(manager.getSubTasksFromEpic(id), list);
     }
 
     @Test

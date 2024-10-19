@@ -36,7 +36,8 @@ public class EpicTaskHandler extends BaseHttpHandler implements HttpHandler {
                         if (epic == null) {
                             sendNotFound(exchange, "Task id: " + id + " отсутствует.");
                         } else {
-                            sendSuccessWithBody(exchange, JsonTaskOption.listOfIntegersToJson(epic.getSubTasksId()));
+                            sendSuccessWithBody(exchange,
+                                    JsonTaskOption.listOfTasksToJson(manager.getSubTasksFromEpic(id)));
                         }
 
                     } else {
