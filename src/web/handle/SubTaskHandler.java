@@ -8,8 +8,6 @@ import task.epic.SubTask;
 import web.JsonTaskOption;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,9 +52,7 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
                     sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
                     return;
                 }
-                InputStream is = exchange.getRequestBody();
-                String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
+                String body = readBody(exchange);
                 Optional<SubTask> optional = JsonTaskOption.getSubTaskFromJson(body);
                 if (optional.isPresent()) {
                     SubTask subTask = optional.get();

@@ -8,7 +8,6 @@ import task.single.SingleTask;
 import web.JsonTaskOption;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -52,8 +51,7 @@ public class SingleTaskHandler extends BaseHttpHandler implements HttpHandler {
                     sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
                     return;
                 }
-                InputStream is = exchange.getRequestBody();
-                String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                String body = readBody(exchange);
                 Optional<SingleTask> optional = JsonTaskOption.getSingleTaskFromJson(body);
                 if (optional.isPresent()) {
                     SingleTask singleTask = optional.get();

@@ -94,4 +94,8 @@ public class BaseHttpHandler {
             return true;
         }
     }
+
+    protected String readBody(HttpExchange h) throws IOException {
+        return new String(h.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+    }
 }

@@ -8,8 +8,6 @@ import task.epic.EpicTask;
 import web.JsonTaskOption;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -68,9 +66,7 @@ public class EpicTaskHandler extends BaseHttpHandler implements HttpHandler {
                     sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
                     return;
                 }
-                InputStream is = exchange.getRequestBody();
-                String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
+                String body = readBody(exchange);
                 Optional<EpicTask> optional = JsonTaskOption.getEpicTaskFromJson(body);
                 if (optional.isPresent()) {
                     EpicTask epicTask = optional.get();
