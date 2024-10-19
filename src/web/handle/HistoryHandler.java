@@ -29,6 +29,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
         String[] pathSplits = path.split("/");
         if (pathSplits.length > 2) {
             sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
+            return;
         }
         List<Task> history = manager.getHistory();
         sendSuccessWithBody(exchange, JsonTaskOption.listOfTasksToJson(history));

@@ -29,6 +29,7 @@ public class PrioritizedTaskHandler extends BaseHttpHandler implements HttpHandl
         String[] pathSplits = path.split("/");
         if (pathSplits.length > 2) {
             sendBadRequest(exchange, "Путь: " + exchange.getRequestURI().getPath() + " не поддерживается.");
+            return;
         }
         List<Task> prioritized = manager.getPrioritizedTasks();
         sendSuccessWithBody(exchange, JsonTaskOption.listOfTasksToJson(prioritized));
